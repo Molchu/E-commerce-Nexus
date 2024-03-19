@@ -8,18 +8,18 @@ const Hero = () => {
   return (
     <div className='hero'>
         <div className="hero-left">
-            <h2>LO MEJOR EN MODA</h2>
+            <h2>LOS MEJORES PRODUCTOS</h2>
             <div>
                 <div className="hero-hand-icon">
-                    <p>Nueva</p>
+                    <p>La mejor</p>
                     <img src={hand_icon} alt="" />
                 </div>
-                <p>colección</p>
+                <p>calidad</p>
                 <p>para todos</p>
             </div>
             <div className="hero-latest-btn">
-                <div>Última coleccion</div>
-                <img src={arrow_icon} width="60" height="60" alt=""/>
+                <div>Últimos productos</div>
+                <img src={arrow_icon} width="50" height="35" alt=""/>
             </div>
         </div>
         <div className='hero-right'>
