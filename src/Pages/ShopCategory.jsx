@@ -14,7 +14,7 @@ const ShopCategory = (props) => {
           <span>Mostrando 1-12</span> de 36 productos
         </p>
         <div className="shopcategory-sort">
-          Sort by <img src={dropdown_icon} alt="" width="20px"/>
+          Ordenar <img src={dropdown_icon} alt="" width="20px"/>
         </div>
       </div>
       <div className="shopcategory-products">

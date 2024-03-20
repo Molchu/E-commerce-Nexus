@@ -7,7 +7,7 @@ let all_product = [
     {
         id:1,
         name: "Conjunto Sea Dragon",
-        category: "men",
+        category: "ropa",
         image:p1_img,
         new_price:100.00,
         old_price:200.50,
@@ -15,7 +15,7 @@ let all_product = [
     {
         id:2,
         name: "Conjunto Leycat",
-        category: "women",
+        category: "ropa",
         image:p2_img,
         new_price:80.00,
         old_price:110.50,
@@ -23,7 +23,7 @@ let all_product = [
     {
         id:3,
         name: "Conjunto Nightcat",
-        category: "women",
+        category: "ropa",
         image:p3_img,
         new_price:85.00,
         old_price:120.50,
@@ -31,7 +31,7 @@ let all_product = [
     {
         id:4,
         name: "Conjunto Verica",
-        category: "kid",
+        category: "ropa",
         image:p4_img,
         new_price:70.00,
         old_price:100.50,
