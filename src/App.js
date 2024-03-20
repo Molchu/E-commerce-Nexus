@@ -12,6 +12,7 @@ import ropa_banner from './Components/Assets/banner_ropa.jpeg'
 import electrodomesticos_banner from './Components/Assets/banner_electrodomesticos.png'
 import gamer_banner from './Components/Assets/banner_gamer.png'
 import joyas_banner from './Components/Assets/banner_joyas.png'
+import Registrar_usuario from './Pages/Registrar_usuario';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         </Route>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/login' element={<LoginSignup/>}/>
+        <Route path='/Registrar_usuario' element={<Registrar_usuario/>}/> 
       </Routes>
       <Footer/>
       </BrowserRouter>
