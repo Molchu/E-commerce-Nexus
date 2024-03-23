@@ -126,7 +126,6 @@ app.get('/allproducts', async (req, res) => {
 })
 
 //Schema creating for user model
-
 const Users = mongoose.model('Users',{
     name:{
         type:String,
@@ -146,6 +145,7 @@ const Users = mongoose.model('Users',{
         default:Date.now,
     }
 })
+
 // Creando un Endpoint para registrar al usuario
 app.post('/signup',async(req, res) => {
 
@@ -174,8 +174,8 @@ app.post('/signup',async(req, res) => {
 
     const token = jwt.sign(data,'secret_ecom');
     res.json({success:true,token})
-})
 
+})
 
 // Creando un endpoint para el login de usuarios
 app.post('/login', async (req,res) => {

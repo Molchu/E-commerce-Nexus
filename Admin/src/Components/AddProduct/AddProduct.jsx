@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import "./AddProduct.css";
+import React, {useState} from "react"
+import "./AddProduct.css"
 import upload_area from "../../assets/upload_area.png"
 
 const AddProduct = () => {
@@ -10,15 +10,14 @@ const AddProduct = () => {
         image:"",
         category:"",
         new_price:"",
-        old_price:"",
+        old_price:""
     })
 
     const imageHandler = (e) => {
         setImage(e.target.files[0]);
     }
-
     const changeHandler = (e) => {
-        setProductDetails({...productDetails, [e.target.name]:e.target.value})
+        setProductDetails({...productDetails,[e.target.name]:e.target.value})
     }
 
     const Add_Product = async () => {
@@ -27,27 +26,29 @@ const AddProduct = () => {
         let product = productDetails;
 
         let formData = new FormData();
-        formData.append("Product",image);
+        formData.append('product',image);
 
-        await fetch("http://localhost:4000/upload",{
-            method:"Post",
+        await fetch('http://localhost:4000/upload',{
+            method:'POST',
             headers:{
-                Accept: "application/json",
+                Accept:'application/json',
             },
             body:formData,
-        }).then((res) => res.json()).then((data) => {responseData=data});
+        }).then((resp) => resp.json()).then((data)=>{responseData = data});
 
         if(responseData.success)
         {
             product.image = responseData.image_url;
             console.log(product);
-            await fetch("http://localhost:4000/addproduct",{
-                method:"Post",
+            await fetch('http://localhost:4000/addproduct',{
+                method:'POST',
                 headers:{
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                        },
+                    Accept:'application/json',
+                    'Content-Type':'application/json',
+                },
                 body:JSON.stringify(product),
+            }).then((resp)=>resp.json()).then((data)=>{
+                data.success?alert("Product Added"):alert("Failed")
             })
         }
     }
@@ -87,4 +88,4 @@ const AddProduct = () => {
     );
 }
 
-export default AddProduct;
+export default AddProduct
