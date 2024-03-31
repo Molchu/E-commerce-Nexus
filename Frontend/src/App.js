@@ -7,6 +7,7 @@ import ShopCategory from './Pages/ShopCategory';
 import Product from './Pages/Product';
 import Cart from './Pages/Cart';
 import LoginSignup from './Pages/LoginSignup';
+import Signin from './Pages/Signin';
 import Footer from './Components/Footer/Footer';
 import ropa_banner from './Components/Assets/banner_ropa.png'
 import electrodomesticos_banner from './Components/Assets/banner_electrodomesticos.png'
@@ -29,6 +30,7 @@ function App() {
         </Route>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/login' element={<LoginSignup/>}/>
+        <Route path='/signin' element={<Signin/>}/>
       </Routes>
       <Footer/>
       </BrowserRouter>
