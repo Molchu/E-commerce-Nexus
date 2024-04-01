@@ -25,16 +25,16 @@ const Navbar = () => {
             </div>
             <img className='nav-dropdown' onClick={dropdown_toggle} src={nav_dropdown} alt="" />
             <ul ref={menuRef} className="nav-menu">
-                <li onClick={()=>{setMenu("shop")}}><Link style={{ textDecoration:'none' }} to='/'>Tienda</Link>{menu==="shop"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("ropa")}}><Link style={{ textDecoration:'none' }} to='/ropa'>Ropa</Link>{menu==="ropa"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("electrodomesticos")}}><Link style={{ textDecoration:'none' }} to='/electrodomesticos'>Electrodomesticos</Link>{menu==="electrodomesticos"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("gamer")}}><Link style={{ textDecoration:'none' }} to='/gamer'>Zona Gamer</Link>{menu==="gamer"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("joyeria")}}><Link style={{ textDecoration:'none' }} to='/joyeria'>Joyeria</Link>{menu==="joyeria"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Shop")}}><Link style={{ textDecoration:'none' }} to='/'>Tienda</Link>{menu==="Shop"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Ropa")}}><Link style={{ textDecoration:'none' }} to='/Ropa'>Ropa</Link>{menu==="Ropa"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Electrodomesticos")}}><Link style={{ textDecoration:'none' }} to='/Electrodomesticos'>Electrodomesticos</Link>{menu==="Electrodomesticos"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Gamer")}}><Link style={{ textDecoration:'none' }} to='/Gamer'>Zona Gamer</Link>{menu==="Gamer"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Joyeria")}}><Link style={{ textDecoration:'none' }} to='/Joyeria'>Joyeria</Link>{menu==="Joyeria"?<hr/>:<></>}</li>
             </ul>
             <div className="nav-login-cart">
                 {localStorage.getItem('auth-token')
                 ?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button>
-                :<Link to='/login'><button>Mi cuenta</button></Link>}   
+                :<Link to='/login'><button>Login</button></Link>}   
                 <Link to='/cart'><img src={cart_icon} alt="" width="45" height="45"/></Link>
                 <div className="nav-cart-count">{getTotalCartItems()}</div>
             </div>
