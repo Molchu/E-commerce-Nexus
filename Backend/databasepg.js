@@ -39,6 +39,19 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/signin', async (req,res) => {
+    const {correo, contrasena} = req.body;
+    try {
+        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1 AND contrasena=$2', [correo, contrasena]);
+        if (existingUser.rows.lenght>0) {
+            res.status(201).json({ message: 'Existe el usuario' });
+        }
+    } catch (error) {
+        console.error('El usuario no existe o la información no es correcta', error);
+        res.status(500).json({ error: 'Error al crear el usuario' })
+    }
+});
+
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
 });

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { Link } from 'react-router-dom';
 import './CSS/Signin.css';
 import axios from 'axios';
 
@@ -20,15 +21,17 @@ const Signin = () => {
   return (
     <div className='signin'>
       <form className="signin-container" onSubmit={handleSubmit}>
-        <h1>Inscribirse</h1>
+        <h1>Inicia sesión</h1>
         <div className="signin-fields">
-          <input type="email" placeholder='Correo electronico' value={correo} onChange={(e) => setCorreo(e.target.value)}/>
-          <input type="password" placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}/>
+          <p>Correo</p>
+          <input type="email" placeholder='ejemplo@email.com' value={correo} onChange={(e) => setCorreo(e.target.value)}/>
+          <p>Contraseña</p>
+          <input type="password" placeholder='Tu contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}/>
           {error && <p className="error-message">{error}</p>}
         </div>
         <button type="submit">Continuar</button>
-        <p className="signin-login">¿Olvidaste la contraseña? <span>Recupera tu cuenta aquí</span></p>
-        <p className="signin-login">¿No tienes una cuenta? <span>Creala aquí</span></p>
+        <p className="signin-login">¿Olvidaste algún dato? <span>Recupera tu cuenta aquí</span></p>
+        <p className="signin-login">¿No tienes una cuenta? <Link to='/login'>Creala aquí</Link></p>
       </form>
     </div>
   )

@@ -6,7 +6,7 @@ import Shop from './Pages/Shop';
 import ShopCategory from './Pages/ShopCategory';
 import Product from './Pages/Product';
 import Cart from './Pages/Cart';
-import LoginSignup from './Pages/LoginSignup';
+import Signup from './Pages/Signup';
 import Signin from './Pages/Signin';
 import Footer from './Components/Footer/Footer';
 import ropa_banner from './Components/Assets/banner_ropa.png'
@@ -29,7 +29,7 @@ function App() {
           <Route path=":productId" element={<Product/>}/>
         </Route>
         <Route path='/cart' element={<Cart/>}/>
-        <Route path='/login' element={<LoginSignup/>}/>
+        <Route path='/login' element={<Signup/>}/>
         <Route path='/signin' element={<Signin/>}/>
       </Routes>
       <Footer/>
