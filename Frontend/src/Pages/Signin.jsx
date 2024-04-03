@@ -10,10 +10,18 @@ const Signin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (correo.length === 0) {
+      setError('Ingrese un correo valido');
+      return;
+    }if (contrasena.length === 0) {
+      setError('Ingrese la contraseña');
+      return;
+    }
     setError('');
     try {
-      const response = await axios.post('/signin', { correo, contrasena});
+      const response = await axios.post('/signin', { correo, contrasena });
       console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
+      window.location.replace('/');
     } catch (error) {
       console.error('Error al enviar datos al servidor:', error);
     }
@@ -31,7 +39,7 @@ const Signin = () => {
         </div>
         <button type="submit">Continuar</button>
         <p className="signin-login">¿Olvidaste algún dato? <span>Recupera tu cuenta aquí</span></p>
-        <p className="signin-login">¿No tienes una cuenta? <Link to='/login'>Creala aquí</Link></p>
+        <p className="signin-login">¿No tienes una cuenta? <Link to='/signup'>Creala aquí</Link></p>
       </form>
     </div>
   )

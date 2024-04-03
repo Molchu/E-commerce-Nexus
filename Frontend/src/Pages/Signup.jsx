@@ -35,6 +35,9 @@ const Signup = () => {
     }if (telefono.length === 0) {
       setError('Ingrese un número de telefono');
       return;
+    }if (id.length === 0) {
+      setError('Ingrese un número de telefono');
+      return;
     }if (contrasena.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres');
       return;
@@ -54,8 +57,9 @@ const Signup = () => {
     }
     setError('');
     try {
-      const response = await axios.post('/login', { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena});
+      const response = await axios.post('/signup', { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena});
       console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
+      window.location.replace('/');
     } catch (error) {
       if (error.response && error.response.status === 400 && error.response.data.error === 'correo ya registrado') {
         setError('Ya existe una cuenta registrada con el correo ingresado');
