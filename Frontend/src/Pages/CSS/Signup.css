@@ -1,0 +1,111 @@
+.signup{
+    width: 100%;
+    height: 87vh;
+    background: #f3c3fe;
+    padding-top: 100px;
+    padding-bottom: 570px;
+}
+.signup-container{
+    width: 580px;
+    height: 1250px;
+    background: white;
+    margin: auto;
+    padding: 40px 70px;
+}
+.signup-container h1{
+    margin: 20px 0px;
+}
+.signup-fields{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+.signup-fields input{
+    height: 70px;
+    width: 100%;
+    padding-left: 20px;
+    border: 1px solid #c9c9c9;
+    outline: none;
+    color: #5c5c5c;
+    font-size: 18px;
+}
+.signup-container button{
+    width: 580px;
+    height: 72px;
+    color: white;
+    background: #2cfd79;
+    margin-top: 30px;
+    border: none;
+    font-size: 24px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.signup-login{
+    margin-top: 20px;
+    color: #5c5c5c;
+    font-size: 18px;
+    font-weight: 500;
+}
+.signup-login span{
+    color: #ff4141;
+    font-weight: 600;
+}
+.signup-agree{
+    display: flex;
+    align-items: center;
+    margin-top: 25px;
+    gap: 20px;
+    color: #5c5c5c;
+    font-size: 18px;
+    font-weight: 500;
+}
+@media(max-width:1280px){
+    .signup{
+        padding-top: 50px;
+    }
+    .signup-container{
+        width: auto;
+        max-width: 500px;
+        max-height: 1100px;
+    }
+    .signup-container h1{
+        margin: 10px 0px;
+    }
+    .signup-fields{
+        gap: 20px;
+        margin-top: 20px;
+    }
+    .signup-fields input{
+        height: 65px;
+        width: 93%;
+    }
+    .signup-container button{
+        width: 100%;
+    }
+    .signup-login{
+        font-size: 16px;
+    }
+    .signup-agree{
+        font-size: 14px;
+        gap: 10px;
+    }
+}
+@media(max-width:800px){
+    .signup-container{
+        padding: 20px 30px;
+    }
+    .signup-container h1{
+        font-size: 24px;
+    }
+    .signup-fields{
+        margin-top: 20px;
+    }
+    .signup-fields input{
+        height: 50px;
+    }
+    .signup-container button{
+        height: 50px;
+        font-size: 16px;
+    }
+}
