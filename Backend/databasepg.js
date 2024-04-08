@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(bodyParser.json());
-
+/*
 app.post('/signup', async (req, res) => {
     const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
     try {
@@ -45,7 +45,41 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ error: 'Error al crear usuario' });
     }
 });
+*/
+app.post('/signup', async (req, res) => {
+    const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
+    try {
+        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1', [correo]);
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({ success: false, errors: 'correo ya registrado' });
+        }
 
+        let cart = {};
+        for (let i = 0; i < 300; i++) {
+            cart[i] = 0;
+        }
+        await client.query('INSERT INTO usuario (nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena, cartData) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [nombre, apellido, correo, telefono, id, fecha_nacimiento,contrasena,JSON.stringify(cart)]);
+
+        const newUser = await client.query('SELECT * FROM usuario WHERE correo=$1', [correo]);
+        const user = newUser.rows[0];
+        if (!user) {
+            return res.status(400).json({ success: false, errors: 'No se pudo crear el usuario' });
+        }
+
+        const data = { user: { id: user.id } };
+        const token = jwt.sign(data, 'secret_ecom');
+        console.log("Generated token:", token); // Imprimir el token aquí
+        res.json({ success: true, token });
+    } catch (error) {
+        console.error('Error al crear usuario:', error);
+        res.status(500).json({ error: 'Error al crear usuario' });
+    }
+});
+
+
+
+
+/*
 app.post('/signin', async (req, res) => {
     const {correo, contrasena} = req.body;
     try {
@@ -62,6 +96,26 @@ app.post('/signin', async (req, res) => {
         res.status(500).json({ error: 'Error al crear el usuario' })
     }
 });
+*/
+
+app.post('/signin', async (req, res) => {
+    const { correo, contrasena } = req.body;
+    try {
+        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1 AND contrasena=$2', [correo, contrasena]);
+        if (existingUser.rows.length === 0) {
+            return res.json({ success: false, errors: "Usuario o contraseña incorrectos" });
+        }
+
+        const data = { user: { id: existingUser.rows[0].id } };
+        const token = jwt.sign(data, 'secret_ecom');
+        console.log("Generated token:", token); // Imprimir el token aquí
+        res.json({ success: true, token });
+    } catch (error) {
+        console.error('Error al verificar el usuario:', error);
+        res.status(500).json({ error: 'Error al verificar el usuario' });
+    }
+});
+
 
 const storage = multer.diskStorage({
     destination: './upload/images',
@@ -153,6 +207,81 @@ app.get('/popularcollection', async (req, res) => {
     } catch (error) {
         console.error('Error al obtener la colección popular:', error);
         res.status(500).json({ error: 'Error al obtener la colección popular' });
+    }
+});
+
+const fetchUser = async (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).send({ error: 'Please authenticate using a valid token' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+
+    try {
+        const decoded = jwt.verify(token, 'secret_ecom');
+        req.user = decoded.user;
+        next();
+    } catch (error) {
+        res.status(401).send({ error: 'Authenticate using a valid token' });
+    }
+};
+
+app.post('/addtocart', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    const productId = req.body.productId;
+
+    console.log('userId:', userId);
+    console.log('productId:', productId);
+
+    // Validar que productId no sea nulo o indefinido
+    if (!productId) {
+        return res.status(400).json({ error: 'El productId es requerido' });
+    }
+
+    try {
+        const existingCartItem = await client.query('SELECT * FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, productId]);
+        if (existingCartItem.rows.length > 0) {
+            await client.query('UPDATE user_product SET quantity = quantity + 1 WHERE user_id = $1 AND product_id = $2', [userId, productId]);
+        } else {
+            await client.query('INSERT INTO user_product (user_id, product_id, quantity) VALUES ($1, $2, 1)', [userId, productId]);
+        }
+        res.send("Product added to cart");
+    } catch (error) {
+        console.error('Error adding product to cart:', error);
+        res.status(500).json({ error: 'Error adding product to cart' });
+    }
+});
+
+app.post('/removefromcart', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    const productId = req.body.productId;
+    try {
+        const existingCartItem = await client.query('SELECT * FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, productId]);
+        if (existingCartItem.rows.length > 0) {
+            if (existingCartItem.rows[0].quantity > 1) {
+                await client.query('UPDATE user_product SET quantity = quantity - 1 WHERE user_id = $1 AND product_id = $2', [userId, productId]);
+            } else {
+                await client.query('DELETE FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, productId]);
+            }
+            res.send("Product removed from cart");
+        } else {
+            res.status(404).json({ error: 'Product not found in cart' });
+        }
+    } catch (error) {
+        console.error('Error removing product from cart:', error);
+        res.status(500).json({ error: 'Error removing product from cart' });
+    }
+});
+
+app.get('/getcart', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
+        res.json(cartItems.rows);
+    } catch (error) {
+        console.error('Error fetching cart items:', error);
+        res.status(500).json({ error: 'Error fetching cart items' });
     }
 });
 
