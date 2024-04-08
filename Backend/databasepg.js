@@ -58,7 +58,7 @@ app.post('/signup', async (req, res) => {
         for (let i = 0; i < 300; i++) {
             cart[i] = 0;
         }
-        await client.query('INSERT INTO usuario (nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena, cartData) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [nombre, apellido, correo, telefono, id, fecha_nacimiento,contrasena,JSON.stringify(cart)]);
+        await client.query('INSERT INTO usuario (nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena) VALUES ($1, $2, $3, $4, $5, $6, $7)', [nombre, apellido, correo, telefono, id, fecha_nacimiento,contrasena]);
 
         const newUser = await client.query('SELECT * FROM usuario WHERE correo=$1', [correo]);
         const user = newUser.rows[0];
