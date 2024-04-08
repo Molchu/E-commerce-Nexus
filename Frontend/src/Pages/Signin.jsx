@@ -20,10 +20,15 @@ const Signin = () => {
     setError('');
     try {
       const response = await axios.post('/signin', { correo, contrasena });
-      console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
-      window.location.replace('/');
+      if (response.data.success) {
+        console.log('Inicio de sesión exitoso');
+        window.location.replace('/');
+      } else {
+        setError('Correo o contraseña incorrectos');
+      }
     } catch (error) {
       console.error('Error al enviar datos al servidor:', error);
+      setError('Error al iniciar sesión, por favor intente nuevamente');
     }
   };
   return (
