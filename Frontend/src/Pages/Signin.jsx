@@ -22,6 +22,7 @@ const Signin = () => {
       const response = await axios.post('/signin', { correo, contrasena });
       if (response.data.success) {
         console.log('Inicio de sesión exitoso');
+        localStorage.setItem('correoUsuario', correo);
         window.location.replace('/');
       } else {
         setError('Correo o contraseña incorrectos');
