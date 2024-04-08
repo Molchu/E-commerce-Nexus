@@ -17,9 +17,9 @@ const Hero = () => {
                 <p>calidad</p>
                 <p>para todos</p>
             </div>
-            <div className="hero-latest-btn">
+            <div className="hero-latest-btn color-button" >
                 <div>Últimos productos</div>
-                <img src={arrow_icon} width="50" height="35" alt=""/>
+                <img src={arrow_icon} width="50" height="35" alt="" />
             </div>
         </div>
         <div className='hero-right'>

@@ -253,10 +253,6 @@ app.post('/addtocart', fetchUser, async (req, res) => {
     }
 });
 
-
-
-
-
 app.post('/removefromcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     const productId = req.body.productId;
@@ -278,9 +274,6 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
     }
 });
 
-
-
-
 app.get('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     try {
@@ -291,8 +284,6 @@ app.get('/getcart', fetchUser, async (req, res) => {
         res.status(500).json({ error: 'Error fetching cart items' });
     }
 });
-
-
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);

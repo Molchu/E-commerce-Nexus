@@ -60,6 +60,17 @@
     font-size: 18px;
     font-weight: 500;
 }
+.terminos-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid black;
+    padding: 20px;
+    z-index: 1000; /* Asegura que la ventana modal esté por encima del resto del contenido */
+  }
+  
 @media(max-width:1280px){
     .signup{
         padding-top: 50px;

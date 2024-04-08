@@ -14,7 +14,7 @@
     gap: 10px;
 }
 .nav-logo p{
-    color: #383838;
+    color: #141414;
     font-size: 46px;
     font-weight: 700;
 }
@@ -23,7 +23,7 @@
     align-items: center;
     list-style: none;
     gap: 50px;
-    color: #626262;
+    color: #5c4545;
     font-size: 20px;
     font-weight: 500;
 }
@@ -83,7 +83,9 @@
         padding: 12px 50px;
     }
     .nav-logo img{
-        width: 40px;
+        
+        width: 40%; /* El logo ocupará el 50% del ancho del contenedor */
+        height: auto; /* Se mantendrá la proporción de aspecto */
     }
     .nav-logo p{
         font-size: 25px;

@@ -50,6 +50,10 @@
     font-weight: 500;
 }
 
+.color-button {
+    background-color:  palevioletred;
+}
+
 .hero-right{
     flex: 1;
     display: flex;

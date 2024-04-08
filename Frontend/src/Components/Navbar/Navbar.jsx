@@ -11,11 +11,26 @@ const Navbar = () => {
         const [menu,setMenu] = useState("shop");
         const {getTotalCartItems}=useContext(ShopContext);
         const menuRef = useRef(); 
+        const correoUsuario = localStorage.getItem('correoUsuario');
+        const [showMenu, setShowMenu] = useState(false);
+
 
         const dropdown_toggle = (e) =>{
             menuRef.current.classList.toggle('nav-menu-visible');
             e.target.classList.toggle('open');
         }
+
+            // Función para manejar el clic en el mensaje de saludo
+        const handleUsernameClick = () => {
+            setShowMenu(!showMenu); // Cambiar el estado de visibilidad del menú desplegable
+        }
+
+            // Función para manejar el clic en "Cerrar sesión"
+        const handleLogout = () => {
+            localStorage.removeItem('auth-token'); // Eliminar token de autenticación
+            localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
+            window.location.replace('/'); // Redireccionar a la página de inicio
+    }
 
     return (
         <div className='navbar'>
@@ -34,7 +49,17 @@ const Navbar = () => {
             <div className="nav-login-cart">
                 {localStorage.getItem('auth-token')
                 ?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button>
-                :<Link to='/signin'><button>Mi cuenta</button></Link>}   
+                :<Link to='/signin'><button>Mi cuenta</button></Link>} 
+                {correoUsuario && (
+                    <div>
+                        <p className="username" onClick={handleUsernameClick}>Hola, {correoUsuario}</p>
+                        {showMenu && (
+                            <ul className="user-menu">
+                                <li><button onClick={handleLogout}>Cerrar sesión</button></li>
+                            </ul>
+                        )}
+                    </div>
+                )}
                 <Link to='/cart'><img src={cart_icon} alt="" width="45" height="45"/></Link>
                 <div className="nav-cart-count">{getTotalCartItems()}</div>
             </div>

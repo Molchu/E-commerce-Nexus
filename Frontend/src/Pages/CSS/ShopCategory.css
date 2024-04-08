@@ -1,7 +1,13 @@
 .shopcategory-banner{
     display: block;
     margin: 30px auto;
-    width: 82%;
+    width: 70%;
+    height: 60%;
+    transition: transform 0.5s ease; /* Transición suave de 0.5 segundos */
+}
+
+.shopcategory-banner:hover {
+  transform: scale(1.1); /* Escala el banner al 110% del tamaño original al pasar el ratón por encima */
 }
 .shopcategory-indexSort{
     display: flex;

@@ -13,12 +13,21 @@ const Signup = () => {
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [mostrarTerminos, setMostrarTerminos] = useState(false);
   const hasUpperCase = /[A-Z]/.test(contrasena);
   const hasLowerCase = /[a-z]/.test(contrasena);
   const hasSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(contrasena);
 
   const handleAceptaTerminosChange = (e) => {
     setAceptaTerminos(e.target.checked);
+  };
+
+  const handleMostrarTerminos = () => {
+    setMostrarTerminos(true);
+  };
+
+  const handleCloseTerminos = () => {
+    setMostrarTerminos(false);
   };
 
   const handleSubmit = async (e) => {
@@ -81,14 +90,14 @@ const Signup = () => {
       <form className="signup-container" onSubmit={handleSubmit}>
         <h1>Registrarse</h1>
         <div className="signup-fields">
-          <p>Nombre</p>
+        <p>Nombre</p>
           <input type="text" placeholder='Tu nombre' value={nombre} onChange={(e) => setNombre(e.target.value)}/>
           <p>Apellido</p>
           <input type="text" placeholder='Tu apellido' value={apellido} onChange={(e) => setApellido(e.target.value)}/>
           <p>Correo</p>
           <input type="email" placeholder='ejemplo@email.com' value={correo} onChange={(e) => setCorreo(e.target.value)}/>
           <p>Teléfono</p>
-          <input type="tel" placeholder='+57 3123342312' value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
+          <input type="tel" placeholder='3123342312' value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
           <p>Identificación</p>
           <input type="integer" placeholder='1085344440' value={id} onChange={(e) => setId(e.target.value)}/>
           <p>Fecha de nacimiento</p>
@@ -102,10 +111,20 @@ const Signup = () => {
         <div className="signup-agree">
           <input type="checkbox" id="terminosCheckbox" checked={aceptaTerminos} onChange={handleAceptaTerminosChange}/>
           <label htmlFor="terminosCheckbox">Acepto los términos y condiciones</label>
+          <button onClick={handleMostrarTerminos}>Ver términos y condiciones</button>
         </div>
       </form>
+      {mostrarTerminos && (
+        <div className="terminos-modal">
+          <div className="terminos-contenido">
+            <h2>Términos y Condiciones</h2>
+            <p>Sujeto al cumplimiento de estas Condiciones de Uso y de los Términos de los Servicios, así como del pago de cualquier tarifa aplicable, Nexus o sus proveedores de contenido le otorgan una licencia limitada, no exclusiva, no transferible, no sublicenciable para acceder a los Servicios de Nexus y hacer uso personal no comercial de ellos. Esta licencia no incluye la reventa ni el uso comercial de los Servicios de Nexus ni de sus contenidos; ni cualquier tipo de recopilación o uso de las listas de productos, descripciones o precios; ningún uso derivado de los Servicios de Nexus ni de sus contenidos; ninguna descarga, copia u otro uso de información de la cuenta para el beneficio de un tercero; ni el uso de minería de datos, robots o herramientas de extracción y recopilación de datos similares. Todos los derechos que no se le conceden expresamente en estas Condiciones de Uso o en los Términos de los Servicios quedan reservados y retenidos por Nexus o sus licenciantes, proveedores, editores y titulares de derechos, u otros proveedores de contenido. No está permitida la reproducción, duplicación, copia, venta, reventa ni explotación de ningún tipo de los Servicios de Nexus, ni de ninguna parte de estos, para fines comerciales sin el consentimiento expreso por escrito de Nexus. No podrá encuadrar ni utilizar técnicas de encuadre en marcas comerciales, logotipos u otra información exclusiva (como imágenes, texto, diseño de página o formularios) de Nexus sin el consentimiento expreso por escrito. No podrá utilizar etiquetas meta (meta tags) ni "texto oculto" que contengan el nombre o marcas comerciales de Nexus sin el consentimiento expreso por escrito de Nexus. No podrá hacer uso indebido de los Servicios de Nexus. Podrá utilizar los Servicios de Nexus solo en la medida en que lo permita la ley. En caso de incumplimiento con estas Condiciones de Uso o con cualquiera de los Términos de los Servicios daremos por terminadas las licencias otorgadas por Nexus.</p>
+            <button onClick={handleCloseTerminos}>Cerrar</button>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default Signup
+export default Signup;
