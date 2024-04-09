@@ -8,6 +8,7 @@ import Cart from './Pages/Cart';
 import Signup from './Pages/Signup';
 import Signin from './Pages/Signin';
 import Footer from './Components/Footer/Footer';
+import Profile from './Pages/Profile';
 import ropa_banner from './Components/Assets/banner_ropa.png'
 import electrodomesticos_banner from './Components/Assets/banner_electrodomesticos.png'
 import gamer_banner from './Components/Assets/banner_gamer.png'
@@ -30,6 +31,7 @@ function App() {
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/signin' element={<Signin/>}/>
+        <Route path='/perfil' element={<Profile/>}/>
       </Routes>
       <Footer/>
       </BrowserRouter>
