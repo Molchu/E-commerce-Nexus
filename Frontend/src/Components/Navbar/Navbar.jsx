@@ -30,7 +30,7 @@ const Navbar = () => {
             localStorage.removeItem('auth-token'); // Eliminar token de autenticación
             localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
             window.location.replace('/'); // Redireccionar a la página de inicio
-    }
+        }
 
     return (
         <div className='navbar'>
@@ -49,12 +49,13 @@ const Navbar = () => {
             <div className="nav-login-cart">
                 {localStorage.getItem('auth-token')
                 ?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button>
-                :<Link to='/signin'><button>Mi cuenta</button></Link>} 
+                :<Link to='/signin'><button>Identificate</button></Link>} 
                 {correoUsuario && (
                     <div>
                         <p className="username" onClick={handleUsernameClick}>Hola, {correoUsuario}</p>
                         {showMenu && (
                             <ul className="user-menu">
+                                <li><Link to='/perfil'><button>Ver perfil</button></Link></li>
                                 <li><button onClick={handleLogout}>Cerrar sesión</button></li>
                             </ul>
                         )}

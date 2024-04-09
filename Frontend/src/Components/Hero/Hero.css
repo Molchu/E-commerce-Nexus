@@ -1,15 +1,40 @@
 .hero{
-    height:100vh;
+    height:auto;
     background: linear-gradient(180deg, #fde1ff, #e1ffea22 60%);
     display:flex;
+    margin-bottom: 20px;
+    overflow: hidden;
 }
+
+.hero2{
+    height:auto;
+    background: linear-gradient(180deg, #fde1ff, #e1ffea22 60%);
+    background-image: url('../Assets/envios.png'); /* Agrega la URL de tu imagen de fondo */
+    background-size: cover; /* Ajusta el tamaño de la imagen para que cubra todo el contenedor */
+    background-position: center; /* Centra la imagen de fondo */
+    display:flex;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.hero3{
+    height:auto;
+    background: linear-gradient(180deg, #fde1ff, #e1ffea22 60%);
+    background-image: url('../Assets/tecnologia.png'); /* Agrega la URL de tu imagen de fondo */
+    background-size: cover; /* Ajusta el tamaño de la imagen para que cubra todo el contenedor */
+    background-position: center; /* Centra la imagen de fondo */
+    display:flex;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
 .hero-left{
     flex:1;
     display:flex;
     flex-direction: column;
     justify-content: center;
-    gap: 20px;
-    padding-left: 180px;
+    gap: 30px;
+    padding-left: 190px;
     line-height: 1.1;
 }
 
@@ -17,6 +42,7 @@
     color: #090909;
     font-size: 26px;
     font-weight: 600;
+    margin-top: 20px;
 }
 
 .hero-left p{
@@ -43,7 +69,7 @@
     width: 310px;
     height: 70px;
     border-radius: 75px;
-    margin-top: 30px;
+    margin-top: 10px;
     background: #ff4141;
     color: white;
     font-size: 22px;
@@ -57,9 +83,13 @@
 .hero-right{
     flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 190px;
+    overflow: hidden;
 }
+
+
 @media(max-width:1280px){
     .hero-left{
         padding-left: 100px;
