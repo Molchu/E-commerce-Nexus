@@ -12,6 +12,14 @@ const Signup = () => {
   const [fecha_nacimiento, setFnacimiento] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
+  const [errorname, setErrorname] = useState('');
+  const [errorlname, setErrorlname] = useState('');
+  const [errormail, setErrormail] = useState('');
+  const [errortel, setErrortel] = useState('');
+  const [errorid, setErrorid] = useState('');
+  const [errorf, setErrorf] = useState('');
+  const [errorpass, setErrorpass] = useState('');
+  const [errorcheck, setErrorcheck] = useState('');
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [mostrarTerminos, setMostrarTerminos] = useState(false);
   const hasUpperCase = /[A-Z]/.test(contrasena);
@@ -33,44 +41,62 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (nombre.length === 0) {
-      setError('Ingrese un nombre valido');
+      setErrorname('Ingrese un nombre valido');
       return;
+    }else{
+      setErrorname(false)
     }if (apellido.length === 0) {
-      setError('Ingrese un apellido valido');
+      setErrorlname('Ingrese un apellido valido');
       return;
+    }else{
+      setErrorlname(false);
     }if (correo.length === 0) {
-      setError('Ingrese su correo');
+      setErrormail('Ingrese su correo');
       return;
+    }else{
+      setErrormail(false);
     }if (!correo.endsWith('.com') && !correo.endsWith('.co')) {
-      setError('El correo debe terminar en ".com" o ".co"');
+      setErrormail('El correo debe terminar en ".com" o ".co"');
       return;
+    }else{
+      setErrormail(false);
     }if (telefono.length === 0 || telefono.length < 8) {
-      setError('Ingrese un número de telefono');
+      setErrortel('Ingrese un número de telefono');
       return;
+    }else{
+      setErrortel(false);
     }if (id.length === 0) {
-      setError('Ingrese un número de identificación');
+      setErrorid('Ingrese un número de identificación');
       return;
+    }else{
+      setErrorid(false)
     }if (id.length < 8) {
-      setError('El número de identificación debe tener al menos 8 dígitos');
+      setErrorid('El número de identificación debe tener al menos 8 dígitos');
       return;
+    }else{
+      setErrorid(false)
     }if (fecha_nacimiento.length === 0) {
-      setError('Seleccione su fecha de nacimiento');
+      setErrorf('Seleccione su fecha de nacimiento');
       return;
+    }else{
+      setErrorf(false)
     }if (contrasena.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+      setErrorpass('La contraseña debe tener al menos 8 caracteres');
       return;
     }else if(!hasLowerCase) {
-      setError('La contraseña debe tener al menos una letra minuscula');
+      setErrorpass('La contraseña debe tener al menos una letra minuscula');
       return;
     }else if(!hasUpperCase) {
-      setError('La contraseña debe tener al menos una letra mayuscula');
+      setErrorpass('La contraseña debe tener al menos una letra mayuscula');
       return;
     }else if(!hasSymbol) {
-      setError('La contraseña debe tener al menos un símbolo');
+      setErrorpass('La contraseña debe tener al menos un símbolo');
       return;
+    }else{
+      setErrorpass(false)
     }
     if (!aceptaTerminos) {
-      setError('Debe aceptar los términos y condiciones para continuar');
+      setErrorcheck('Debe aceptar los términos y condiciones para continuar');
       return;
     }
     setError('');
@@ -90,21 +116,21 @@ const Signup = () => {
       <form className="signup-container" onSubmit={handleSubmit}>
         <h1>Registrarse</h1>
         <div className="signup-fields">
-        <p>Nombre</p>
+          <p>Nombre{errorname && <div className="error-message">{errorname}</div>}</p>
           <input type="text" placeholder='Tu nombre' value={nombre} onChange={(e) => setNombre(e.target.value)}/>
-          <p>Apellido</p>
+          <p>Apellido{errorlname && <div className="error-message">{errorlname}</div>}</p>
           <input type="text" placeholder='Tu apellido' value={apellido} onChange={(e) => setApellido(e.target.value)}/>
-          <p>Correo</p>
+          <p>Correo{errormail && <div className="error-message">{errormail}</div>}</p>
           <input type="email" placeholder='ejemplo@email.com' value={correo} onChange={(e) => setCorreo(e.target.value)}/>
-          <p>Teléfono</p>
+          <p>Teléfono{errortel && <div className="error-message">{errortel}</div>}</p>
           <input type="tel" placeholder='3123342312' value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
-          <p>Identificación</p>
+          <p>Identificación{errorid && <div className="error-message">{errorid}</div>}</p>
           <input type="integer" placeholder='1085344440' value={id} onChange={(e) => setId(e.target.value)}/>
-          <p>Fecha de nacimiento</p>
+          <p>Fecha de nacimiento{errorf && <div className="error-message">{errorf}</div>}</p>
           <input type="date" title='Fecha' value={fecha_nacimiento} onChange={(e) => setFnacimiento(e.target.value)}/>
-          <p>Contraseña</p>
-          <input type="password" placeholder='Tu contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}/>
-          {error && <p className="error-message">{error}</p>}
+          <p>Contraseña{errorpass && <div className="error-message">{errorpass}</div>}</p>
+          <input type="password" placeholder='Mínimo 8 caracter, una letra mayuscula, minuscula y un símbolo' value={contrasena} onChange={(e) => setContrasena(e.target.value)}/>
+          {errorcheck && <p className="error-message">{errorcheck}</p>}
         </div>
         <button type="submit">Continuar</button>
         <p className="signup-login">¿Ya tienes una cuenta? <Link to='/signin'>Inicia sesión aquí</Link></p>

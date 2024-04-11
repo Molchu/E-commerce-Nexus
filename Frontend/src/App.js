@@ -13,11 +13,13 @@ import ropa_banner from './Components/Assets/banner_ropa.png'
 import electrodomesticos_banner from './Components/Assets/banner_electrodomesticos.png'
 import gamer_banner from './Components/Assets/banner_gamer.png'
 import joyas_banner from './Components/Assets/banner_joyas.png'
+import Topbar from './Components/Topbar/Topbar'
 
 function App() {
   return (
     <div>
       <BrowserRouter>
+      <Topbar/>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Shop/>}/>
