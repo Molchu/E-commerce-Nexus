@@ -33,10 +33,10 @@ const Navbar = () => {
         }
 
     return (
+ 
         <div className='navbar'>
             <div className="nav-logo">
-                <img src={logo} alt="" width="100" height="100"/>
-                <p className="title">Nexus</p>
+                <img src={logo} alt="" width="60" height="60"/>
             </div>
             <img className='nav-dropdown' onClick={dropdown_toggle} src={nav_dropdown} alt="" />
             <ul ref={menuRef} className="nav-menu">

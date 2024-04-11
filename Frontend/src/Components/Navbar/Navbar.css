@@ -4,6 +4,8 @@
     padding: 16px;
     box-shadow: 0 1px 3px -2px black;
     align-items: center;
+    height: 40px;
+    background: linear-gradient(180deg, #f3ecf3, #ee9bd9ad 80%);
 }
 .title{
     font-family:Poppins;
