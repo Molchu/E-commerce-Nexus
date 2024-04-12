@@ -14,7 +14,7 @@ const port = 4000;
 
 const client = new Client({
     host: "localhost",
-    user: "postgres",
+    user: "Molchu",
     port: 5432,
     password: "admin",
     database: "Nexus"
