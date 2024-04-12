@@ -27,6 +27,7 @@
     font-size: 14px;
 }
 
+
 .addproduct-price{
     display: flex;
      gap: 40px;
@@ -49,6 +50,7 @@
     object-fit: contain;
     margin: 10px 0px;
 }
+
 
 .addproduct-btn{
     margin-top: 20px;
