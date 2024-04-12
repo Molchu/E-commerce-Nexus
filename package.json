@@ -1,18 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "e-commerce-nexus-rama_4",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "pg": "^8.11.3"
-=======
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
@@ -49,6 +35,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
->>>>>>> 78dedf0a3136807d502f1d01fcc8a8ad3b488586
   }
 }

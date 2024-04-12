@@ -35,9 +35,7 @@ const ProductDisplay = (props) => {
           <div className="productdisplay-right-price-new">${product.new_price}</div>
         </div>
         <div className="productdisplay-right-description">
-          Estos productos traidos desde las mismisimas entrañas de mordor
-          pueden proporcionarle a su portador una cantidad de habilidades
-          inimaginables.
+        <h2>{product.description}</h2>
         </div>
         <div className="productdisplay-right-size">
           <h1>Seleccionar talla</h1>
@@ -50,8 +48,8 @@ const ProductDisplay = (props) => {
           </div>
         </div>
         <button onClick={()=>{addToCart(product.id)}}>Añadir al carrito</button>
-        <p className="productdisplay-right-category"><span>Categoria :</span>Elfos, Conjunto mágico</p>
-        <p className="productdisplay-right-category"><span>Etiquetas :</span>Ropa mágica, Elementos, Hechizos</p>
+        <p className="productdisplay-right-category"><span>Categoria :</span>{product.category}</p>
+        <p className="productdisplay-right-category"><span>Etiquetas :</span>Trendy, Novedad</p>
     </div>
   </div>
   )

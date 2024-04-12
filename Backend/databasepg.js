@@ -136,7 +136,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
 })
 
 app.post('/addproduct',async (req, res) => {
-    const { name, image, category, new_price, old_price } = req.body;
+    const { name, image, category, new_price, old_price,description } = req.body;
     try {
         const products = await client.query('SELECT * FROM product');
         let id;
@@ -147,11 +147,11 @@ app.post('/addproduct',async (req, res) => {
             id = 1;
         }
 
-        await client.query('INSERT INTO product (id, name, image, category, new_price, old_price) VALUES ($1, $2, $3, $4, $5, $6)', [id, name, image, category, new_price, old_price]);
+        await client.query('INSERT INTO product (id, name, image, category, new_price, old_price, description) VALUES ($1, $2, $3, $4, $5, $6, $7)', [id, name, image, category, new_price, old_price, description]);
         console.log("Saved");
         res.json({
             success: true,
-            name: name,
+            name: name
         })
     } catch (error) {
         console.error('Error al crear producto:', error);

@@ -10,12 +10,14 @@ const AddProduct = () => {
         image:"",
         category:"",
         new_price:"",
-        old_price:""
+        old_price:"",
+        description:""
     })
 
     const imageHandler = (e) => {
         setImage(e.target.files[0]);
     }
+    
     const changeHandler = (e) => {
         setProductDetails({...productDetails,[e.target.name]:e.target.value})
     }
@@ -84,6 +86,13 @@ const AddProduct = () => {
             </label>
             <input onChange={imageHandler} type="file" name="image" id="file-input" hidden/>
            </div>
+
+           <div className="addproduct-itemfield">
+            <p>Product description</p>
+            <input value={productDetails.description} onChange={changeHandler} type="text" name="description" placeholder="Escriba aqui una descripcion" />
+           </div>
+
+
            <button onClick={()=>{Add_Product()}} className="addproduct-btn">ADD</button>
         </div>
     );
