@@ -20,7 +20,7 @@ const ShopContextProvider = (props) => {
         .then((response)=>response.json())
         .then((data)=>setAll_Product(data))
         .catch((error) => console.error('Error al obtener los productos:', error));
-        
+        //aqui falla
         const authToken = localStorage.getItem('auth-token')
         if(authToken){
             fetch('http://localhost:4000/getcart',{

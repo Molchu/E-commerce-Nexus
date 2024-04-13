@@ -255,6 +255,7 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
     }
 });
 
+//aqui es get o post
 app.post('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     try {
