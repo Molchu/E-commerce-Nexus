@@ -27,7 +27,7 @@ const Navbar = () => {
 
             // Función para manejar el clic en "Cerrar sesión"
         const handleLogout = () => {
-            localStorage.removeItem('auth-token'); // Eliminar token de autenticación
+            localStorage.removeItem('accessToken'); // Eliminar token de autenticación
             localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
             window.location.replace('/'); // Redireccionar a la página de inicio
         }

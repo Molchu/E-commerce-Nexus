@@ -102,6 +102,9 @@ const Signup = () => {
     setError('');
     try {
       const response = await axios.post('/signup', { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena});
+      const { token } = response.data;
+      console.log('Token guardado:', token);
+      localStorage.setItem('accessToken', token);
       console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
       window.location.replace('/');
     } catch (error) {
