@@ -17,7 +17,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const token = localStorage.getItem('accessToken');
+                const token = localStorage.getItem('auth-token');
                 const response = await axios.get('http://localhost:4000/userinfo', {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -49,7 +49,7 @@ const Profile = () => {
 
     const handleConfirm = async () => {
         try {
-            const token = localStorage.getItem('accessToken');
+            const token = localStorage.getItem('auth-token');
             await axios.put('http://localhost:4000/userinfo', newUserInfo, {
                 headers: {
                     Authorization: `Bearer ${token}`

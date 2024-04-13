@@ -23,6 +23,8 @@ const Signin = () => {
       if (response.data.success) {
         console.log('Inicio de sesión exitoso');
         localStorage.setItem('correoUsuario', correo);
+        const{ token } = response.data;
+        localStorage.setItem('token', token);
         window.location.replace('/');
       } else {
         setError('Correo o contraseña incorrectos');
