@@ -105,6 +105,7 @@ const Signup = () => {
       const { token } = response.data;
       console.log('Token guardado:', token);
       localStorage.setItem('auth-token', token);
+      localStorage.setItem('correoUsuario', correo);
       console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
       window.location.replace('/');
     } catch (error) {
