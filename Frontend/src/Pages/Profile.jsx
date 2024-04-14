@@ -80,32 +80,34 @@ const Profile = () => {
     }
 
     return (
-        <div className="profile-container">
-            <h1>Perfil de usuario</h1>
-            {editing ? (
-                <>
-                    <label>Nombre:</label>
-                    <input type="text" name="nombre" value={newUserInfo.nombre} onChange={handleChange} />
-                    <label>Apellido:</label>
-                    <input type="text" name="apellido" value={newUserInfo.apellido} onChange={handleChange} />
-                    <label>Correo electrónico:</label>
-                    <input type="email" name="correo" value={newUserInfo.correo} onChange={handleChange} />
-                    <label>Teléfono:</label>
-                    <input type="tel" name="telefono" value={newUserInfo.telefono} onChange={handleChange} />
-                    <label>Fecha de nacimiento:</label>
-                    <input type="date" name="fecha_nacimiento" value={newUserInfo.fecha_nacimiento} onChange={handleChange} />
-                    <button onClick={handleConfirm}>Confirmar</button>
-                </>
-            ) : (
-                <>
-                    <p>Nombre: {user.nombre}</p>
-                    <p>Apellido: {user.apellido}</p>
-                    <p>Correo electrónico: {user.correo}</p>
-                    <p>Teléfono: {user.telefono}</p>
-                    <p>Fecha de nacimiento: {user.fecha_nacimiento}</p>
-                    <button onClick={handleEdit}>Editar</button>
-                </>
-            )}
+        <div className="profile">
+            <div className="profile-container">
+                <h1>Perfil de usuario</h1>
+                {editing ? (
+                    <>
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre" value={newUserInfo.nombre} onChange={handleChange} />
+                        <label>Apellido:</label>
+                        <input type="text" name="apellido" value={newUserInfo.apellido} onChange={handleChange} />
+                        <label>Correo electrónico:</label>
+                        <input type="email" name="correo" value={newUserInfo.correo} onChange={handleChange} />
+                        <label>Teléfono:</label>
+                        <input type="tel" name="telefono" value={newUserInfo.telefono} onChange={handleChange} />
+                        <label>Fecha de nacimiento:</label>
+                        <input type="date" name="fecha_nacimiento" value={newUserInfo.fecha_nacimiento} onChange={handleChange} />
+                        <button onClick={handleConfirm}>Confirmar</button>
+                    </>
+                ) : (
+                    <>
+                        <p>Nombre: {user.nombre}</p>
+                        <p>Apellido: {user.apellido}</p>
+                        <p>Correo electrónico: {user.correo}</p>
+                        <p>Teléfono: {user.telefono}</p>
+                        <p>Fecha de nacimiento: {user.fecha_nacimiento}</p>
+                        <button onClick={handleEdit}>Editar</button>
+                    </>
+                )}
+            </div>
         </div>
     );
 };
