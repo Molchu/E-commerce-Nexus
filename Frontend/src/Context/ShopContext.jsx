@@ -20,7 +20,7 @@ const ShopContextProvider = (props) => {
         .then((response)=>response.json())
         .then((data)=>setAll_Product(data))
         .catch((error) => console.error('Error al obtener los productos:', error));
-        //aqui falla
+        
         const authToken = localStorage.getItem('auth-token')
         if(authToken){
             fetch('http://localhost:4000/getcart',{
@@ -29,11 +29,21 @@ const ShopContextProvider = (props) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`
                 },
-            }).then((response)=>response.json())
-            .then((data)=>{
-                console.log(data); 
-                setCartItems(data);
             })
+            .then((response)=>response.json())
+            .then((data) => {
+                if (Array.isArray(data) && data.length > 0) {
+                    setCartItems((prevCartItems) => {
+                        const newCartItems = { ...prevCartItems };
+                        data.forEach((item) => {
+                            const { id, quantity } = item;
+                            newCartItems[id] = quantity; // Actualiza la cantidad del producto en el carrito
+                        });
+                        console.log(newCartItems); // Agrega esta línea para verificar el estado
+                        return newCartItems;
+                    });
+                }
+            })            
             .catch((error) => console.error('Error al obtener el carrito:', error));
         }
     }, [])
@@ -54,8 +64,12 @@ const ShopContextProvider = (props) => {
                     if (!response.ok) {
                         throw new Error('Error adding product to cart');
                     }
-                    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-                    return response.json();
+                    setCartItems((prevCartItems) => {
+                    const newCartItems = { ...prevCartItems };
+                    newCartItems[itemId] = (newCartItems[itemId] || 0) + 1;
+                    return newCartItems;
+                   });
+                   return response.json();
                 })
                 .then((data) => console.log(data))
                 .catch((error) => console.error('Error al añadir al carrito:', error));

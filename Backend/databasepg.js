@@ -255,18 +255,25 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
     }
 });
 
-//aqui es get o post
 app.post('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     try {
-        const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, p.old_price, up.quantity FROM product p INNER JOIN user_product up ON p.id = up.product_id WHERE up.user_id = $1', [userId]);
+        const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
         console.log("Cart items fetched");
-        res.send(cartItems.rows);
+        const formattedCartItems = cartItems.rows.map(item => ({
+            id: item.id,
+            name: item.name,
+            image: item.image,
+            new_price: item.new_price,
+            quantity: item.quantity
+        }));
+        res.json(formattedCartItems);
     } catch (error) {
         console.error('Error fetching cart items:', error);
         res.status(500).json({ error: 'Error fetching cart items' });
     }
 });
+
 
 const verifyAccessToken = async (req, res, next) => {
     const authHeader = req.header('Authorization');
