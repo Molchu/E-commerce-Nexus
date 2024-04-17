@@ -14,6 +14,7 @@ import electrodomesticos_banner from './Components/Assets/banner_electrodomestic
 import gamer_banner from './Components/Assets/banner_gamer.png'
 import joyas_banner from './Components/Assets/banner_joyas.png'
 import Topbar from './Components/Topbar/Topbar'
+import ShowSearch from './Pages/ShowSearch';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/product" element={<Product/>}>
           <Route path=":productId" element={<Product/>}/>
         </Route>
+        <Route path='/showsearch' element={<ShowSearch/>}/>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/signin' element={<Signin/>}/>

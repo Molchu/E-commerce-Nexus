@@ -4,6 +4,9 @@
     background: #f3c3fe;
     padding-top: 100px;
     padding-bottom: 800px;
+    background-image: url('../../Components/Assets/fondo.png');
+    background-size: cover;
+    background-position: center;
 }
 .signup-container{
     width: 590px;

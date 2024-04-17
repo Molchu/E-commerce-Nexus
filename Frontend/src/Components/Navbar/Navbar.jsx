@@ -32,31 +32,41 @@ const Navbar = () => {
             window.location.replace('/'); // Redireccionar a la página de inicio
         }
 
+            // Funciones para mostrar y ocultar el menú al pasar el mouse
+        const handleMouseEnter = () => {
+            setShowMenu(true);
+        }
+
+        const handleMouseLeave = () => {
+            setShowMenu(false);
+        }
+
     return (
  
         <div className='navbar'>
-            <div className="nav-logo">
-                <img src={logo} alt="" width="60" height="60"/>
-            </div>
+           <Link to='/'>
+                <div className="nav-logo" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                    <img src={logo} alt="" width="60" height="60"/>
+                </div>
+            </Link>
             <img className='nav-dropdown' onClick={dropdown_toggle} src={nav_dropdown} alt="" />
             <ul ref={menuRef} className="nav-menu">
-            <li onClick={()=>{setMenu("Shop")}}><Link style={{ textDecoration:'none' }} to='/'>Tienda</Link>{menu==="Shop"?<hr/>:<></>}</li>
+                <li onClick={()=>{setMenu("Shop")}}><Link style={{ textDecoration:'none' }} to='/'>Tienda</Link>{menu==="Shop"?<hr/>:<></>}</li>
                 <li onClick={()=>{setMenu("Ropa")}}><Link style={{ textDecoration:'none' }} to='/Ropa'>Ropa</Link>{menu==="Ropa"?<hr/>:<></>}</li>
                 <li onClick={()=>{setMenu("Electrodomesticos")}}><Link style={{ textDecoration:'none' }} to='/Electrodomesticos'>Electrodomesticos</Link>{menu==="Electrodomesticos"?<hr/>:<></>}</li>
                 <li onClick={()=>{setMenu("Gamer")}}><Link style={{ textDecoration:'none' }} to='/Gamer'>Zona Gamer</Link>{menu==="Gamer"?<hr/>:<></>}</li>
                 <li onClick={()=>{setMenu("Joyeria")}}><Link style={{ textDecoration:'none' }} to='/Joyeria'>Joyeria</Link>{menu==="Joyeria"?<hr/>:<></>}</li>
             </ul>
             <div className="nav-login-cart">
-                {localStorage.getItem('auth-token')
-                ?<button onClick={()=>{localStorage.removeItem('auth-token');window.location.replace('/')}}>Logout</button>
-                :<Link to='/signin'><button>Identificate</button></Link>} 
+                {!localStorage.getItem('auth-token') &&
+                    <Link to='/signin'><button>Identificate</button></Link>} 
                 {correoUsuario && (
-                    <div>
+                    <div className='prueba'>
                         <p className="username" onClick={handleUsernameClick}>Hola, {correoUsuario}</p>
                         {showMenu && (
-                            <ul className="user-menu">
-                                <li><Link to='/perfil'><button>Ver perfil</button></Link></li>
-                                <li><button onClick={handleLogout}>Cerrar sesión</button></li>
+                            <ul className="user-menu" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                                <Link to='/perfil'><button>Ver perfil</button></Link>
+                                <button onClick={handleLogout}>Cerrar sesión</button>
                             </ul>
                         )}
                     </div>

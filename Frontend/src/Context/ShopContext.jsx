@@ -19,52 +19,86 @@ const ShopContextProvider = (props) => {
         fetch('http://localhost:4000/allproducts')
         .then((response)=>response.json())
         .then((data)=>setAll_Product(data))
-
-        if(localStorage.getItem('auth-token')){
+        .catch((error) => console.error('Error al obtener los productos:', error));
+        
+        const authToken = localStorage.getItem('auth-token')
+        if(authToken){
             fetch('http://localhost:4000/getcart',{
-                method:'POST',
+                method: 'POST',
                 headers:{
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem('auth-token')}`,
-                    'Content-Type':'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
                 },
-                body:"",
-            }).then((response)=>response.json())
-            .then((data)=>setCartItems(data));
+            })
+            .then((response)=>response.json())
+            .then((data) => {
+                if (Array.isArray(data) && data.length > 0) {
+                    setCartItems((prevCartItems) => {
+                        const newCartItems = { ...prevCartItems };
+                        data.forEach((item) => {
+                            const { id, quantity } = item;
+                            newCartItems[id] = quantity; // Actualiza la cantidad del producto en el carrito
+                        });
+                        console.log(newCartItems); // Agrega esta línea para verificar el estado
+                        return newCartItems;
+                    });
+                }
+            })            
+            .catch((error) => console.error('Error al obtener el carrito:', error));
         }
     }, [])
     
-    const addToCart = (itemId) =>{
-        setCartItems((prev)=>({...prev,[itemId]:prev[itemId]+1}));
-        if(localStorage.getItem('auth-token')){
-            fetch('http://localhost:4000/addtocart',{
+    const addToCart = (itemId) => {
+        //setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+        const authToken = localStorage.getItem('auth-token');
+        if (authToken) {
+            fetch('http://localhost:4000/addtocart', {
                 method:'POST',
-                headers:{
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem('auth-token')}`,
-                    'Content-Type':'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}` // Enviar el token en la cabecera de la solicitud
                 },
-                body:JSON.stringify({"itemId":itemId}),
+                body: JSON.stringify({ "productId": itemId }),
             })
-            .then((response)=>response.json())
-            .then((data)=>console.log(data));
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Error adding product to cart');
+                    }
+                    setCartItems((prevCartItems) => {
+                    const newCartItems = { ...prevCartItems };
+                    newCartItems[itemId] = (newCartItems[itemId] || 0) + 1;
+                    return newCartItems;
+                   });
+                   return response.json();
+                })
+                .then((data) => console.log(data))
+                .catch((error) => console.error('Error al añadir al carrito:', error));
         }
-    }
+    };
+    
 
     const removeFromCart = (itemId) =>{
-        setCartItems((prev)=>({...prev,[itemId]:prev[itemId]-1}));
-        if(localStorage.getItem('auth-token')){
+        const authToken = localStorage.getItem('auth-token');
+        if(authToken){
             fetch('http://localhost:4000/removefromcart',{
                 method:'POST',
                 headers:{
-                    Accept:'application/form-data',
-                    'auth-token':`${localStorage.getItem('auth-token')}`,
-                    'Content-Type':'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}` // Enviar el token en la cabecera de la solicitud
                 },
-                body:JSON.stringify({"itemId":itemId}),
+                body:JSON.stringify({ "productId":itemId }),
             })
-            .then((response)=>response.json())
-            .then((data)=>console.log(data));
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Error removing product from cart');
+                    }
+                    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+                    return response.json();
+                })
+                .then(data => {
+                console.log('Producto eliminado del carrito:', data);
+                })
+                .catch((error) => console.error('Error al remover del carrito:', error));
         }
     }
     
@@ -75,7 +109,9 @@ const ShopContextProvider = (props) => {
             if(cartItems[item]>0)
             {
                 let itemInfo = all_product.find((product)=>product.id===Number(item))
-                totalAmount += itemInfo.new_price * cartItems[item];
+                if(itemInfo) {
+                    totalAmount += itemInfo.new_price * cartItems[item];
+                }
             }
             
         }

@@ -29,23 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(bodyParser.json());
-/*
-app.post('/signup', async (req, res) => {
-    const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
-    try {
-        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1', [correo]);
-        if (existingUser.rows.length>0) {
-            return res.status(400).json({ error: 'correo ya registrado' })
-        }
 
-        await client.query('INSERT INTO usuario (nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena) VALUES ($1, $2, $3, $4, $5, $6, $7)', [nombre, apellido, correo, telefono, id, fecha_nacimiento,contrasena]);
-        res.status(201).json({ message: 'Usuario creado exitosamente' });
-    } catch (error) {
-        console.error('Error al crear usuario:', error);
-        res.status(500).json({ error: 'Error al crear usuario' });
-    }
-});
-*/
 app.post('/signup', async (req, res) => {
     const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
     try {
@@ -75,28 +59,6 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ error: 'Error al crear usuario' });
     }
 });
-
-
-
-
-/*
-app.post('/signin', async (req, res) => {
-    const {correo, contrasena} = req.body;
-    try {
-        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1 AND contrasena=$2', [correo, contrasena]);
-        if (existingUser.rows.length == 0) {
-            res.status(400).json({ message: 'No existe el usuario' });
-        }
-        else {
-            await client.query('UPDATE usuario SET activo=$1 WHERE correo=$2', [1,correo]);
-            return res.status(200).json({ message:'Sesión iniciada' })
-        }
-    } catch (error) {
-        console.error('El usuario no existe o la información no es correcta', error);
-        res.status(500).json({ error: 'Error al crear el usuario' })
-    }
-});
-*/
 
 app.post('/signin', async (req, res) => {
     const { correo, contrasena } = req.body;
@@ -129,6 +91,9 @@ const upload = multer({storage:storage})
 app.use('/images', express.static("upload/images"))
 
 app.post("/upload", upload.single('product'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No se ha recibido ningún archivo' });
+    }
     res.json({
         success:1,
         image_url:`http://localhost:${port}/images/${req.file.filename}`
@@ -233,12 +198,10 @@ app.post('/addtocart', fetchUser, async (req, res) => {
 
     console.log('userId:', userId);
     console.log('productId:', productId);
-
     // Validar que productId no sea nulo o indefinido
     if (!productId) {
         return res.status(400).json({ error: 'El productId es requerido' });
     }
-
     try {
         const existingCartItem = await client.query('SELECT * FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, productId]);
         if (existingCartItem.rows.length > 0) {
@@ -246,10 +209,10 @@ app.post('/addtocart', fetchUser, async (req, res) => {
         } else {
             await client.query('INSERT INTO user_product (user_id, product_id, quantity) VALUES ($1, $2, 1)', [userId, productId]);
         }
-        res.send("Product added to cart");
+        res.json({ success: true, message: 'Product added to cart' });
     } catch (error) {
         console.error('Error adding product to cart:', error);
-        res.status(500).json({ error: 'Error adding product to cart' });
+        res.status(500).json({ success: false, error: 'Error adding product to cart' });
     }
 });
 
@@ -264,9 +227,11 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
             } else {
                 await client.query('DELETE FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, productId]);
             }
-            res.send("Product removed from cart");
+            //res.send("Product removed from cart");
+            res.json({ success: true, message: 'Product removed from cart' });
         } else {
-            res.status(404).json({ error: 'Product not found in cart' });
+            //res.status(404).json({ error: 'Product not found in cart' });
+            res.status(500).json({ success: false, error: 'Product not found in cart' });
         }
     } catch (error) {
         console.error('Error removing product from cart:', error);
@@ -274,16 +239,88 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
     }
 });
 
-app.get('/getcart', fetchUser, async (req, res) => {
+app.post('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     try {
         const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
-        res.json(cartItems.rows);
+        console.log("Cart items fetched");
+        const formattedCartItems = cartItems.rows.map(item => ({
+            id: item.id,
+            name: item.name,
+            image: item.image,
+            new_price: item.new_price,
+            quantity: item.quantity
+        }));
+        res.json(formattedCartItems);
     } catch (error) {
         console.error('Error fetching cart items:', error);
         res.status(500).json({ error: 'Error fetching cart items' });
     }
 });
+
+
+const verifyAccessToken = async (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).send({ error: 'Please authenticate using a valid token' });
+    }
+
+    const accessToken = authHeader.replace('Bearer ', '');
+    try {
+        const decoded = jwt.verify(accessToken, 'secret_ecom');
+        req.user = decoded.user;
+        next();
+    } catch (error) {
+        res.status(401).send({ error: 'Invalid token' });
+    }
+};
+
+app.get('/userinfo', verifyAccessToken, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const userInfo = await client.query('SELECT * FROM usuario WHERE id = $1', [userId]);
+        if (userInfo.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const user = userInfo.rows[0];
+        res.json({
+            id: user.id,
+            nombre: user.nombre,
+            apellido: user.apellido,
+            correo: user.correo,
+            telefono: user.telefono,
+            fecha_nacimiento: user.fecha_nacimiento
+        });
+    } catch (error) {
+        console.error('Error fetching user information:', error);
+        res.status(500).json({ error: 'Error fetching user information' });
+    }
+});
+
+app.put('/userinfo', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    const { nombre, apellido, correo, telefono, fecha_nacimiento } = req.body;
+
+    try {
+        await client.query('UPDATE usuario SET nombre = $1, apellido = $2, correo = $3, telefono = $4, fecha_nacimiento = $5 WHERE id = $6', [nombre, apellido, correo, telefono, fecha_nacimiento, userId]);
+        res.status(200).json({ success: true, message: 'Información del usuario actualizada exitosamente' });
+    } catch (error) {
+        console.error('Error al actualizar la información del usuario:', error);
+        res.status(500).json({ success: false, error: 'Error al actualizar la información del usuario' });
+    }
+});
+
+app.get('/search', async (req, res) => {
+    const searchTerm = req.query.q;
+    try {
+        const searchResults = await client.query('SELECT * FROM product WHERE name ILIKE $1', [`%${searchTerm}%`]);
+        res.json(searchResults.rows);
+    } catch (error) {
+        console.error('Error al realizar la búsqueda:', error);
+        res.status(500).json({ error: 'Error al realizar la búsqueda' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
