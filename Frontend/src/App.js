@@ -15,6 +15,8 @@ import gamer_banner from './Components/Assets/banner_gamer.png'
 import joyas_banner from './Components/Assets/banner_joyas.png'
 import Topbar from './Components/Topbar/Topbar'
 import ShowSearch from './Pages/ShowSearch';
+import GiftCard from './Pages/GiftCard';
+
 
 function App() {
   return (
@@ -29,13 +31,15 @@ function App() {
         <Route path='/Gamer' element={<ShopCategory banner={gamer_banner}  category="Gamer"/>}/>
         <Route path='/Joyeria' element={<ShopCategory banner={joyas_banner} category="Joyeria"/>}/>
         <Route path="/product" element={<Product/>}>
-          <Route path=":productId" element={<Product/>}/>
+        <Route path=":productId" element={<Product/>}/>
+
         </Route>
         <Route path='/showsearch' element={<ShowSearch/>}/>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/signin' element={<Signin/>}/>
         <Route path='/perfil' element={<Profile/>}/>
+        <Route path='/regalo' element={<GiftCard/>}/>
       </Routes>
       <Footer/>
       </BrowserRouter>

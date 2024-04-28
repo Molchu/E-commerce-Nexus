@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import './Navbar.css'
 import logo from '../Assets/Logo.png'
 import cart_icon from '../Assets/cart_icon.png'
@@ -8,58 +8,105 @@ import nav_dropdown from '../Assets/nav_dropdown.png'
 
 const Navbar = () => {
 
-        const [menu,setMenu] = useState("shop");
-        const {getTotalCartItems}=useContext(ShopContext);
-        const menuRef = useRef(); 
-        const correoUsuario = localStorage.getItem('correoUsuario');
-        const [showMenu, setShowMenu] = useState(false);
+    const [menu, setMenu] = useState("shop");
+    const { getTotalCartItems } = useContext(ShopContext);
+    const menuRef = useRef();
+    const correoUsuario = localStorage.getItem('correoUsuario');
+    const [showMenu, setShowMenu] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
-        const dropdown_toggle = (e) =>{
-            menuRef.current.classList.toggle('nav-menu-visible');
-            e.target.classList.toggle('open');
+    const closeMenu = () => {
+        setIsMenuOpen(false);
+    };
+
+    // Función para cerrar el menú desplegable si se hace clic fuera de él
+    const handleClickOutside = (event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+            setIsMenuOpen(false);
         }
+    };
 
-            // Función para manejar el clic en el mensaje de saludo
-        const handleUsernameClick = () => {
-            setShowMenu(!showMenu); // Cambiar el estado de visibilidad del menú desplegable
-        }
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
-            // Función para manejar el clic en "Cerrar sesión"
-        const handleLogout = () => {
-            localStorage.removeItem('auth-token'); // Eliminar token de autenticación
-            localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
-            window.location.replace('/'); // Redireccionar a la página de inicio
-        }
+    const dropdown_toggle = (e) => {
+        menuRef.current.classList.toggle('nav-menu-visible');
+        e.target.classList.toggle('open');
+    }
 
-            // Funciones para mostrar y ocultar el menú al pasar el mouse
-        const handleMouseEnter = () => {
-            setShowMenu(true);
-        }
+    // Función para manejar el clic en el mensaje de saludo
+    const handleUsernameClick = () => {
+        setShowMenu(!showMenu); // Cambiar el estado de visibilidad del menú desplegable
+    }
 
-        const handleMouseLeave = () => {
-            setShowMenu(false);
-        }
+    // Función para manejar el clic en "Cerrar sesión"
+    const handleLogout = () => {
+        localStorage.removeItem('auth-token'); // Eliminar token de autenticación
+        localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
+        window.location.replace('/'); // Redireccionar a la página de inicio
+    }
+
+    // Funciones para mostrar y ocultar el menú al pasar el mouse
+    const handleMouseEnter = () => {
+        setShowMenu(true);
+    }
+
+    const handleMouseLeave = () => {
+        setShowMenu(false);
+    }
+
 
     return (
- 
         <div className='navbar'>
-           <Link to='/'>
-                <div className="nav-logo" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                    <img src={logo} alt="" width="60" height="60"/>
+
+            <div className="menu-dropdown" onClick={toggleMenu}>
+                <img className='nav-dropdown' src={nav_dropdown} alt="" />
+                <span>Todo</span>
+            </div>
+
+            {isMenuOpen && (
+                <div className="menu-container" ref={menuRef}> {/* Ref para el contenedor del menú */}
+                    <ul className="nav-menud">
+                        <li><Link to='/'>Tienda</Link></li>
+                        <div>--------------</div>
+                        <a>Categorías:</a>
+                        <li><Link to='/Ropa'>Ropa</Link></li>
+                        <li><Link to='/Electrodomesticos'>Electrodomesticos</Link></li>
+                        <li><Link to='/Gamer'>Zona Gamer</Link></li>
+                        <li><Link to='/Joyeria'>Joyeria</Link></li>
+                        <div>--------------</div>
+                        <a>Programas:</a>
+                        <li><Link to='/regalo'>Tarjetas de regalo</Link></li>
+                        <div>--------------</div>
+                    </ul>
+                </div>
+            )}
+
+            <Link to='/'>
+                <div className="nav-logo">
+                    <img src={logo} alt="" width="60" height="60" />
                 </div>
             </Link>
-            <img className='nav-dropdown' onClick={dropdown_toggle} src={nav_dropdown} alt="" />
-            <ul ref={menuRef} className="nav-menu">
-                <li onClick={()=>{setMenu("Shop")}}><Link style={{ textDecoration:'none' }} to='/'>Tienda</Link>{menu==="Shop"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("Ropa")}}><Link style={{ textDecoration:'none' }} to='/Ropa'>Ropa</Link>{menu==="Ropa"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("Electrodomesticos")}}><Link style={{ textDecoration:'none' }} to='/Electrodomesticos'>Electrodomesticos</Link>{menu==="Electrodomesticos"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("Gamer")}}><Link style={{ textDecoration:'none' }} to='/Gamer'>Zona Gamer</Link>{menu==="Gamer"?<hr/>:<></>}</li>
-                <li onClick={()=>{setMenu("Joyeria")}}><Link style={{ textDecoration:'none' }} to='/Joyeria'>Joyeria</Link>{menu==="Joyeria"?<hr/>:<></>}</li>
-            </ul>
+
+            <div className="options">
+                <a> <Link to='/'>Ofertas del día</Link></a>
+                <a> <Link to='/regalo'>Tarjetas de regalo</Link></a>
+                <a> <Link to='/'>Servicio al cliente</Link></a>
+            </div>
+            <a href="/" class="options2">Nexus music: 3 meses gratis</a>
+
+
             <div className="nav-login-cart">
                 {!localStorage.getItem('auth-token') &&
-                    <Link to='/signin'><button>Identificate</button></Link>} 
+                    <Link to='/signin'><button>Identificate</button></Link>}
                 {correoUsuario && (
                     <div className='prueba'>
                         <p className="username" onClick={handleUsernameClick}>Hola, {correoUsuario}</p>
@@ -71,11 +118,11 @@ const Navbar = () => {
                         )}
                     </div>
                 )}
-                <Link to='/cart'><img src={cart_icon} alt="" width="45" height="45"/></Link>
+                <Link to='/cart'><img src={cart_icon} alt="" width="45" height="45" /></Link>
                 <div className="nav-cart-count">{getTotalCartItems()}</div>
             </div>
         </div>
-        
+
     )
 }
 

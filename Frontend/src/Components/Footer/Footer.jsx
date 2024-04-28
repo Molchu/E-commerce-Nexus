@@ -9,7 +9,6 @@ export const Footer = () => {
   return (
     <div className="footer">
         <div className="footer-logo">
-            
             <p>Nexus</p>
         </div>
         <ul className="footer-links">

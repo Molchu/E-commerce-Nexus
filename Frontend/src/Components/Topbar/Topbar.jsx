@@ -1,5 +1,7 @@
 import React from "react"
 import styled from 'styled-components'
+import searchIcon from '../Assets/search.png'
+import locationIcon from '../Assets/location.png'
 
 
 const Container = styled.div`
@@ -22,9 +24,22 @@ const Left = styled.div`
 `;
 
 const Language = styled.span`
-  font-size: 16px;
+  font-size: 22px;
   cursor: pointer;
   font-weight: bold;
+`;
+
+const MessageContainer = styled.div`
+  margin-left: 20px;
+`;
+
+const Message = styled.span`
+  font-size: 16px;
+`;
+
+const LocationIcon = styled.img`
+  width:30px;
+  height: 30px;
 `;
 
 const SearchContainer = styled.div`
@@ -33,14 +48,29 @@ const SearchContainer = styled.div`
   align-items: center;
   margin-left: 30px;
   padding: 5px;
-  width: 400px;
-  height: 25px;
+  width: 800px;
+  height: 28px;
+`;
+
+const SearchButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+`;
+
+const SearchIcon = styled.img`
+  width:30px;
+  height: 30px;
 `;
 
 const Input = styled.input`
   border: none;
-  width:400px;
-  height: 25px;
+  width:800px;
+  height: 30px;
+  padding-right: 30 px;
+  font-size: 16px;
+  font-style: oblique;
 `;
 
 const Center = styled.div`
@@ -64,7 +94,11 @@ const MenuItem = styled.div`
   margin-left: 25px;
 `;
 
+
+
 const Topbar = () => {
+
+  
 
   
     return (
@@ -72,15 +106,22 @@ const Topbar = () => {
             <Container>
                 <Wrapper>
                     <Left>
-                        <Language>ES</Language>
-                        <SearchContainer>
-                            <Input placeholder="Buscar productos"/>    
-                        </SearchContainer>
+                        <Logo>NEXUS</Logo>
+                        <MessageContainer>
+                        <LocationIcon src={locationIcon} alt="Location"/>
+                        <Message>Colombia</Message>
+                        </MessageContainer>
                     </Left>
                     <Center>
-                      <Logo>NEXUS</Logo>
+                      <SearchContainer>
+                            <Input placeholder="Buscar productos en Nexus"/> 
+                            <SearchButton>
+                              <SearchIcon src={searchIcon} alt="Search"/>
+                            </SearchButton>   
+                        </SearchContainer>
                     </Center>
                     <Right>
+                    <Language>ES</Language>
                       <MenuItem>Listas</MenuItem>
                       <MenuItem>Devoluciones y pedidos</MenuItem>
                     </Right>
