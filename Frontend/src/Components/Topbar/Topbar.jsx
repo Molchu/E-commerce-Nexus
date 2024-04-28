@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from 'styled-components'
 import searchIcon from '../Assets/search.png'
 import locationIcon from '../Assets/location.png'
@@ -96,10 +96,22 @@ const MenuItem = styled.div`
 
 
 
-const Topbar = () => {
+const Topbar = ({setResults}) => {
+  const [input, setInput] = useState("")
 
-  
+  const fetchData = (value) => {
+    fetch("http://localhost:4000/allproducts").then((response) => response.json()).then((json) => {
+      const results = json.filter((user) => {
+        return value && user && user.name &&  user.name.toLowerCase().includes(value)
+      });
+      setResults(results)
+    });
+  };
 
+  const handleChange = (value) => {
+    setInput(value);
+    fetchData(value);
+  };
   
     return (
  
@@ -114,7 +126,11 @@ const Topbar = () => {
                     </Left>
                     <Center>
                       <SearchContainer>
-                            <Input placeholder="Buscar productos en Nexus"/> 
+                            <Input 
+                            placeholder="Buscar productos en Nexus"
+                            value={input}
+                            onChange={(e) => handleChange(e.target.value)}
+                            /> 
                             <SearchButton>
                               <SearchIcon src={searchIcon} alt="Search"/>
                             </SearchButton>   

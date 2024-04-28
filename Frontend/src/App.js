@@ -1,3 +1,4 @@
+import { useState } from "react";
 import './App.css';
 import Navbar from './Components/Navbar/Navbar';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -19,11 +20,13 @@ import GiftCard from './Pages/GiftCard';
 
 
 function App() {
+  const [results, setResults] = useState([]);
   return (
     <div>
       <BrowserRouter>
-      <Topbar/>
+      <Topbar setResults={setResults}/>
       <Navbar/>
+      <ShowSearch results={results} />
       <Routes>
         <Route path='/' element={<Shop/>}/>
         <Route path='/Ropa' element={<ShopCategory banner={ropa_banner} category="Ropa"/>}/>
