@@ -110,7 +110,10 @@ const Topbar = ({setResults}) => {
 
   const handleChange = (value) => {
     setInput(value);
-    fetchData(value);
+  };
+
+  const handleSearch = () => {
+    fetchData(input);
   };
   
     return (
@@ -131,7 +134,7 @@ const Topbar = ({setResults}) => {
                             value={input}
                             onChange={(e) => handleChange(e.target.value)}
                             /> 
-                            <SearchButton>
+                            <SearchButton onClick={handleSearch}>
                               <SearchIcon src={searchIcon} alt="Search"/>
                             </SearchButton>   
                         </SearchContainer>
