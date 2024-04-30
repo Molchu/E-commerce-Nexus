@@ -321,6 +321,23 @@ app.get('/search', async (req, res) => {
     }
 });
 
+app.post('/adminsignin', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const admin = await client.query('SELECT * FROM admin WHERE email=$1 AND password=$2', [email, password]);
+        if (admin.rows.length === 0) {
+            return res.json({ success: false, errors: "Usuario o contraseña incorrectos" });
+        }
+
+        const data = { admin: { id: admin.rows[0].id } };
+        const token = jwt.sign(data, 'secret_ecom_admin');
+        console.log("Generated token:", token); // Imprimir el token aquí
+        res.json({ success: true, token });
+    } catch (error) {
+        console.error('Error al verificar el admin:', error);
+        res.status(500).json({ error: 'Error al verificar el admin' });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
