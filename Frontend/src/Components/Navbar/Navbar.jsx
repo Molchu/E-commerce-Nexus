@@ -85,7 +85,9 @@ const Navbar = () => {
                         <div>--------------</div>
                         <a>Programas:</a>
                         <li><Link to='/regalo'>Tarjetas de regalo</Link></li>
+                        <li><Link to ='/musica'>Nexus Music</Link></li>
                         <div>--------------</div>
+                        <li><Link to ='/servicio'>Preguntas frecuentes</Link></li>
                     </ul>
                 </div>
             )}
@@ -99,9 +101,9 @@ const Navbar = () => {
             <div className="options">
                 <a> <Link to='/'>Ofertas del día</Link></a>
                 <a> <Link to='/regalo'>Tarjetas de regalo</Link></a>
-                <a> <Link to='/'>Servicio al cliente</Link></a>
+                <a> <Link to='/servicio'>Servicio al cliente</Link></a>
             </div>
-            <a href="/" class="options2">Nexus music: 3 meses gratis</a>
+            <a href="/musica" class="options2">Nexus music: 3 meses gratis</a>
 
 
             <div className="nav-login-cart">
