@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const multer = require("multer");
 const path = require("path");
@@ -9,7 +10,20 @@ const {Client} = require('pg');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Reemplaza esto con el origen de tu frontend
+    credentials: true, // Permite incluir cookies en las solicitudes
+  }));
+app.use(cookieParser());
+app.use((req, res, next) => {
+    // Setear la cookie solo si no está presente
+    if (!req.cookies.guestCartId) {
+        const newGuestCartId = Math.random().toString(36).substring(2, 15); // Generar un nuevo identificador de carrito de usuario no registrado
+        res.cookie('guestCartId', newGuestCartId, { httpOnly: true, secure: true }); // Asegurar que la cookie solo sea accesible por HTTP y en conexiones seguras
+    }
+    next();
+});
+
 const port = 4000;
 
 const client = new Client({
@@ -53,6 +67,14 @@ app.post('/signup', async (req, res) => {
         const data = { user: { id: user.id } };
         const token = jwt.sign(data, 'secret_ecom');
         console.log("Generated token:", token); // Imprimir el token aquí
+        // Aquí se obtiene o genera el userCartId
+        const userCartId = req.cookies.userCartId || Math.random().toString(36).substring(2, 15);
+        console.log('usercadid',userCartId);
+
+        // Se asocia el userCartId al usuario
+        await client.query('UPDATE usuario SET cart_id = $1 WHERE id = $2', [userCartId, user.id]);
+        console.log(userCartId);
+
         res.json({ success: true, token });
     } catch (error) {
         console.error('Error al crear usuario:', error);
@@ -70,13 +92,34 @@ app.post('/signin', async (req, res) => {
 
         const data = { user: { id: existingUser.rows[0].id } };
         const token = jwt.sign(data, 'secret_ecom');
-        console.log("Generated token:", token); // Imprimir el token aquí
+        // Obtener el userCartId asociado al usuario que inició sesión
+        const userCartId = await obtenerUserCart(existingUser.rows[0].id);
+        console.log(userCartId);
         res.json({ success: true, token });
     } catch (error) {
         console.error('Error al verificar el usuario:', error);
         res.status(500).json({ error: 'Error al verificar el usuario' });
     }
 });
+
+const obtenerUserCart = async (userId) => {
+    try {
+        const result = await client.query('SELECT cart_id FROM usuario WHERE id = $1', [userId]);
+        if (result.rows.length > 0) {
+            return result.rows[0].cart_id;
+        } else {
+            // Si no se encuentra un userCartId asociado al usuario, se puede generar uno nuevo
+            const newUserCartId = Math.random().toString(36).substring(2, 15);
+            await client.query('UPDATE usuario SET cart_id = $1 WHERE id = $2', [newUserCartId, userId]);
+            return newUserCartId;
+        }
+    } catch (error) {
+        console.error('Error al obtener userCartId:', error);
+        // Manejar el error adecuadamente, ya sea lanzando una excepción o devolviendo un valor predeterminado
+        return null;
+    }
+};
+
 
 
 const storage = multer.diskStorage({
@@ -241,6 +284,7 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
 
 app.post('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
+    //const userCartId = req.body.userCartId; // Modificación para incluir userCartId
     try {
         const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
         console.log("Cart items fetched");
@@ -338,6 +382,87 @@ app.post('/adminsignin', async (req, res) => {
         res.status(500).json({ error: 'Error al verificar el admin' });
     }
 });
+
+app.post('/addtocartguest', async (req, res) => {
+    const { productId } = req.body;
+    const guestCartId = req.headers['guestcartid']; // Accede al guestCartId desde el encabezado
+    console.log('guestCartId:', guestCartId);
+
+    // Verificar que productId no sea nulo o indefinido
+    if (!productId || !guestCartId) {
+        return res.status(400).json({ error: 'El productId y el guestCartId son requeridos' });
+    }
+
+    try {
+        const existingCartItem = await client.query('SELECT * FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        if (existingCartItem.rows.length > 0) {
+            await client.query('UPDATE guest_product SET quantity = quantity + 1 WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        } else {
+            await client.query('INSERT INTO guest_product (cart_id, product_id, quantity) VALUES ($1, $2, 1)', [guestCartId, productId]);
+        }
+        res.json({ success: true, message: 'Product added to guest cart' });
+    } catch (error) {
+        console.error('Error adding product to guest cart:', error);
+        res.status(500).json({ success: false, error: 'Error adding product to guest cart' });
+    }
+});
+
+app.post('/removefromcartguest', async (req, res) => {
+    const { productId } = req.body;
+    try {
+        // Verificar si el producto está en el carrito del usuario no registrado
+        const guestCartId = req.headers['guestcartid'];
+        console.log('guestCartId:', guestCartId);
+        const cart = await client.query('SELECT * FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        if (cart.rows.length > 0) {
+            if (cart.rows[0].quantity > 1) {
+                await client.query('UPDATE guest_product SET quantity = quantity - 1 WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+            } else {
+                await client.query('DELETE FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+            }
+            res.json({ success: true, message: 'Product removed from guest cart' });
+        } else {
+            res.status(500).json({ success: false, error: 'El producto no está en el carrito' });
+        }
+    } catch (error) {
+        console.error('Error al remover producto del carrito:', error);
+        res.status(500).json({ error: 'Error al remover producto del carrito' });
+    }
+});
+
+
+
+app.post('/mergecarts', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    const guestCartId = req.headers['guestcartid'];
+    //const guestCartId = req.cookies.guestCartId; 
+
+    try {
+        // Verificar que el usuario tenga un carrito de invitado antes de fusionar
+        if (!guestCartId) {
+            return res.status(400).json({ error: 'No se encontró un carrito de invitado para fusionar' });
+        }
+
+        const guestCartItems = await client.query('SELECT * FROM guest_product WHERE cart_id = $1', [guestCartId]);
+        for (const item of guestCartItems.rows) {
+            const existingCartItem = await client.query('SELECT * FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, item.product_id]);
+            if (existingCartItem.rows.length > 0) {
+                await client.query('UPDATE user_product SET quantity = quantity + $1 WHERE user_id = $2 AND product_id = $3', [item.quantity, userId, item.product_id]);
+            } else {
+                await client.query('INSERT INTO user_product (user_id, product_id, quantity) VALUES ($1, $2, $3)', [userId, item.product_id, item.quantity]);
+            }
+        }
+
+        // Eliminar los productos del carrito de usuario no registrado
+        await client.query('DELETE FROM guest_product WHERE cart_id = $1', [guestCartId]);
+
+        res.json({ success: true, message: 'Guest cart merged with user cart' });
+    } catch (error) {
+        console.error('Error merging guest cart with user cart:', error);
+        res.status(500).json({ success: false, error: 'Error merging guest cart with user cart' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);

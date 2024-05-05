@@ -51,6 +51,7 @@ const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('auth-token'); // Eliminar token de autenticación
         localStorage.removeItem('correoUsuario'); // Eliminar correo del usuario
+        localStorage.removeItem('guestCartId');
         window.location.replace('/'); // Redireccionar a la página de inicio
     }
 
