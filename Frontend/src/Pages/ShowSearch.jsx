@@ -1,5 +1,5 @@
 import React from 'react';
-import './CSS/ShopCategory.css';
+import './CSS/ShowSearch.css';
 import Item from '../Components/Item/Item';
 import RelatedProducts from '../Components/RelatedProducts/RelatedProducts';
 
@@ -16,7 +16,10 @@ const ShowSearch = ({ results, relatedProducts }) => {
           <RelatedProducts relatedProducts={relatedProducts} />
         </>
       ) : (
-        <div className='no-results'>No se encontró el producto</div>
+        <div className='no-results'>
+          <p>No se encontró el producto</p>
+          <p>¡Pero tenemos muchos otros productos increíbles para ti!</p>
+        </div>
       )}
     </div>
   );

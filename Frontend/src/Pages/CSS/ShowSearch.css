@@ -1,0 +1,44 @@
+.show-search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+  }
+  
+  .founded-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    justify-content: center; 
+    align-items: center; 
+  }
+  
+  .product-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .no-results p {
+    margin: 10px 0;
+  }
+  
+  .no-results p:first-child {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .no-results p:last-child {
+    font-size: 1rem;
+  }
+  
