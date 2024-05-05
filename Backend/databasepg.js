@@ -11,9 +11,10 @@ const {Client} = require('pg');
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000', // Reemplaza esto con el origen de tu frontend
+    origin: ['http://localhost:3000', 'http://localhost:5173'],// Reemplaza esto con el origen de tu frontend
     credentials: true, // Permite incluir cookies en las solicitudes
   }));
+
 app.use(cookieParser());
 app.use((req, res, next) => {
     // Setear la cookie solo si no está presente

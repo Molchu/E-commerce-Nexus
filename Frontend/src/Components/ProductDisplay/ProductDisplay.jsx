@@ -3,10 +3,12 @@ import './ProductDisplay.css';
 import star_icon from "../Assets/star_icon.png";
 import star_dull_icon from "../Assets/star_dull_icon.png";
 import { ShopContext } from '../../Context/ShopContext';
+import { useNavigate } from 'react-router-dom';
 
 const ProductDisplay = (props) => {
   const { product } = props;
   const { addToCart } = useContext(ShopContext);
+  const navigate = useNavigate();
 
   console.log('Categoría del producto:', product.category); // Imprimir la categoría del producto en la consola
 
@@ -52,7 +54,7 @@ const ProductDisplay = (props) => {
             </div>
           </div>
         )}
-        <button onClick={() => { addToCart(product.id) }}>Añadir al carrito</button>
+        <button onClick={() => { addToCart(product.id); navigate('/cart'); }}>Añadir al carrito</button>
         <p className="productdisplay-right-category"><span>Categoria :</span>{product.category}</p>
         <p className="productdisplay-right-category"><span>Etiquetas :</span>Trendy, Novedad</p>
       </div>

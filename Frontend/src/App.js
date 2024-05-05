@@ -19,6 +19,7 @@ import ShowSearch from './Pages/ShowSearch';
 import GiftCard from './Pages/GiftCard';
 import CustomerService from './Pages/CustomerService';
 import NexusMusic from './Pages/NexusMusic';
+import Payment from './Pages/Payment';
 
 function App() {
   const [results, setResults] = useState([]);
@@ -46,6 +47,7 @@ function App() {
           <Route path='/regalo' element={<GiftCard />} />
           <Route path='/servicio' element={<CustomerService/>} />
           <Route path='/musica' element={<NexusMusic/>} />
+          <Route path='/payment' element={<Payment />} />
         </Routes>
         <Footer />
       </BrowserRouter>

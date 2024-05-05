@@ -1,0 +1,18 @@
+.payment-interface {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    margin: 20px auto;
+    max-width: 600px;
+  }
+  
+  .payment-interface h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .payment-interface p {
+    font-size: 16px;
+  }
+  
