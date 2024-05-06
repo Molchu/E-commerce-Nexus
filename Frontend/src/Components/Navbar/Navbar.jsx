@@ -100,7 +100,7 @@ const Navbar = () => {
             </Link>
 
             <div className="options">
-                <a> <Link to='/'>Ofertas del día</Link></a>
+                <a> <Link to='/ofertas'>Ofertas del día</Link></a>
                 <a> <Link to='/regalo'>Tarjetas de regalo</Link></a>
                 <a> <Link to='/servicio'>Servicio al cliente</Link></a>
             </div>

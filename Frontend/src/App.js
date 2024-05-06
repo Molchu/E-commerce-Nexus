@@ -19,6 +19,7 @@ import ShowSearch from './Pages/ShowSearch';
 import GiftCard from './Pages/GiftCard';
 import CustomerService from './Pages/CustomerService';
 import NexusMusic from './Pages/NexusMusic';
+import Offers from './Pages/Offers';
 import Payment from './Pages/Payment';
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path='/regalo' element={<GiftCard />} />
           <Route path='/servicio' element={<CustomerService/>} />
           <Route path='/musica' element={<NexusMusic/>} />
+          <Route path='/ofertas' element={<Offers/>}/>
           <Route path='/payment' element={<Payment />} />
         </Routes>
         <Footer />
