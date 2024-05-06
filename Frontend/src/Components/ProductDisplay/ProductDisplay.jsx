@@ -54,7 +54,10 @@ const ProductDisplay = (props) => {
             </div>
           </div>
         )}
-        <button onClick={() => { addToCart(product.id); navigate('/cart'); }}>Añadir al carrito</button>
+        <button onClick={() => {
+          addToCart(product.id);
+          window.alert('¡Producto añadido al carrito!');
+        }}>Añadir al carrito</button>
         <p className="productdisplay-right-category"><span>Categoria :</span>{product.category}</p>
         <p className="productdisplay-right-category"><span>Etiquetas :</span>Trendy, Novedad</p>
       </div>
