@@ -5,8 +5,14 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const mercadopago = require("mercadopago");
+const dotenv = require("dotenv");
 const {Client} = require('pg');
+dotenv.config();
 
+mercadopago.configure({
+    access_token: process.env.ACCESS_TOKEN || "",
+});
 
 const app = express();
 app.use(express.json());
@@ -483,7 +489,7 @@ app.post("/mercado_pago", async (req,res) => {
             auto_return: "approved",
         };
 
-        const respuesta = await mercadopago.preferences.create(preference);
+        const respuesta = await mercadopago.preferences.create(preference.response.init_point);
         console.log(respuesta);
         res.status(200).json(respuesta);
     } catch (error) {
