@@ -98,6 +98,8 @@ const Topbar = ({ setResults, setShowSearchResults }) => {
   const [input, setInput] = useState('');
   const navigate = useNavigate(); // Obtiene la función de navegación
 
+  
+
   const handleChange = (value) => {
     setInput(value);
   };
@@ -118,9 +120,16 @@ const Topbar = ({ setResults, setShowSearchResults }) => {
         console.error('Error al buscar productos:', error);
       });
   };
+  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleSearch = () => {
     fetchData(input);
+    setInput('');
   };
 
   const handleClearSearch = () => {
@@ -145,6 +154,7 @@ const Topbar = ({ setResults, setShowSearchResults }) => {
               placeholder="Buscar productos en Nexus"
               value={input}
               onChange={(e) => handleChange(e.target.value)}
+              onKeyPress={handleKeyPress}
             />
             <SearchButton onClick={handleSearch}>
               <SearchIcon src={searchIcon} alt="Search" />

@@ -78,13 +78,13 @@ const Navbar = () => {
                     <ul className="nav-menud">
                         <li><Link to='/'>Tienda</Link></li>
                         <div>--------------</div>
-                        <a>Categorías:</a>
+                        <li><strong>Categorías:</strong></li>
                         <li><Link to='/Ropa'>Ropa</Link></li>
                         <li><Link to='/Electrodomesticos'>Electrodomesticos</Link></li>
                         <li><Link to='/Gamer'>Zona Gamer</Link></li>
                         <li><Link to='/Joyeria'>Joyeria</Link></li>
                         <div>--------------</div>
-                        <a>Programas:</a>
+                        <li><strong>Categorías:</strong></li>
                         <li><Link to='/regalo'>Tarjetas de regalo</Link></li>
                         <li><Link to ='/musica'>Nexus Music</Link></li>
                         <div>--------------</div>
@@ -100,11 +100,11 @@ const Navbar = () => {
             </Link>
 
             <div className="options">
-                <a> <Link to='/ofertas'>Ofertas del día</Link></a>
-                <a> <Link to='/regalo'>Tarjetas de regalo</Link></a>
-                <a> <Link to='/servicio'>Servicio al cliente</Link></a>
+                <Link to='/ofertas'>Ofertas del día</Link>
+                <Link to='/regalo'>Tarjetas de regalo</Link>
+                <Link to='/servicio'>Servicio al cliente</Link>
             </div>
-            <a href="/musica" class="options2">Nexus music: 3 meses gratis</a>
+            <a href="/musica" className="options2">Nexus music: 3 meses gratis</a>
 
 
             <div className="nav-login-cart">

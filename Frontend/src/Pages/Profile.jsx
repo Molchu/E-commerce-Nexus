@@ -10,8 +10,7 @@ const Profile = () => {
         nombre: '',
         apellido: '',
         correo: '',
-        telefono: '',
-        fecha_nacimiento: ''
+        telefono: ''
     });
 
     useEffect(() => {
@@ -42,8 +41,7 @@ const Profile = () => {
             nombre: user.nombre,
             apellido: user.apellido,
             correo: user.correo,
-            telefono: user.telefono,
-            fecha_nacimiento: user.fecha_nacimiento
+            telefono: user.telefono
         });
     };
 
@@ -93,8 +91,6 @@ const Profile = () => {
                         <input type="email" name="correo" value={newUserInfo.correo} onChange={handleChange} />
                         <label>Teléfono:</label>
                         <input type="tel" name="telefono" value={newUserInfo.telefono} onChange={handleChange} />
-                        <label>Fecha de nacimiento:</label>
-                        <input type="date" name="fecha_nacimiento" value={newUserInfo.fecha_nacimiento} onChange={handleChange} />
                         <button onClick={handleConfirm}>Confirmar</button>
                     </>
                 ) : (
@@ -103,7 +99,6 @@ const Profile = () => {
                         <p>Apellido: {user.apellido}</p>
                         <p>Correo electrónico: {user.correo}</p>
                         <p>Teléfono: {user.telefono}</p>
-                        <p>Fecha de nacimiento: {user.fecha_nacimiento}</p>
                         <button onClick={handleEdit}>Editar</button>
                     </>
                 )}

@@ -190,6 +190,23 @@ app.post('/removeproduct', async (req, res) => {
     }
 });
 
+// Edit a product by ID
+app.put('/editproduct/:id', async (req, res) => {
+    const productId = req.params.id;
+    const { name, image, category, new_price, old_price, description } = req.body;
+    try {
+        await client.query('UPDATE product SET name=$1, image=$2, category=$3, new_price=$4, old_price=$5, description=$6 WHERE id=$7', [name, image, category, new_price, old_price, description, productId]);
+        console.log("Product Updated");
+        res.json({
+            success: true,
+            name: name
+        });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Error updating product' });
+    }
+});
+
 // Get all products
 app.get('/allproducts', async (req, res) => {
     try {
@@ -350,16 +367,17 @@ app.get('/userinfo', verifyAccessToken, async (req, res) => {
 
 app.put('/userinfo', fetchUser, async (req, res) => {
     const userId = req.user.id;
-    const { nombre, apellido, correo, telefono, fecha_nacimiento } = req.body;
+    const { nombre, apellido, correo, telefono } = req.body; // Eliminamos fecha_nacimiento de aquí
 
     try {
-        await client.query('UPDATE usuario SET nombre = $1, apellido = $2, correo = $3, telefono = $4, fecha_nacimiento = $5 WHERE id = $6', [nombre, apellido, correo, telefono, fecha_nacimiento, userId]);
+        await client.query('UPDATE usuario SET nombre = $1, apellido = $2, correo = $3, telefono = $4 WHERE id = $5', [nombre, apellido, correo, telefono, userId]); // Eliminamos fecha_nacimiento de aquí
         res.status(200).json({ success: true, message: 'Información del usuario actualizada exitosamente' });
     } catch (error) {
         console.error('Error al actualizar la información del usuario:', error);
         res.status(500).json({ success: false, error: 'Error al actualizar la información del usuario' });
     }
 });
+
 
 app.get('/search', async (req, res) => {
     const searchTerm = req.query.q;

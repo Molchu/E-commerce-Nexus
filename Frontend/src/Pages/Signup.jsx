@@ -40,6 +40,10 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const today = new Date();
+    const minBirthDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate()); // 10 years ago from today
+    const selectedBirthDate = new Date(fecha_nacimiento);
+
     if (nombre.length === 0) {
       setErrorname('Ingrese un nombre valido');
       return;
@@ -80,6 +84,11 @@ const Signup = () => {
       return;
     }else{
       setErrorf(false)
+    }if (selectedBirthDate > minBirthDate) {
+      setErrorf('Debe seleccionar una fecha de nacimiento válida (mínimo 10 años antes de la fecha actual)');
+      return;
+    } else {
+      setErrorf(false);
     }if (contrasena.length < 8) {
       setErrorpass('La contraseña debe tener al menos 8 caracteres');
       return;

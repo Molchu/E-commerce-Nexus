@@ -54,7 +54,7 @@ const FaqAnswer = styled.p`
 const CustomerServiceSection = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [faqData, setFaqData] = useState([
-    { question: '¿Cómo puedo realizar un pedido?', answer: 'Puedes realizar un pedido...' },
+    { question: '¿Cómo puedo realizar un pedido?', answer: 'Puedes realizar un pedido dandole clic a los productos que te llamen la atención, luego los agregas al carrito y para realizar el pago deberas iniciar sesión, en caso de no tener una cuenta te puedes registrar en nuestra página' },
     { question: '¿Cuáles son los métodos de pago aceptados?', answer: 'Aceptamos tarjetas de crédito, débito...' },
     { question: 'No puedo crear una cuenta', answer: 'Lamentamos que tengas problemas creando una cuenta de Nexus. ¿Intentaste utilizar la página <a href="/signup">Crear cuenta</a>?' },
     { question: '¿A que lugares hacen envios?', answer: 'Hacemos envíos a nivel nacional(Colombia), a todos los depertamentos de forma rápida y segura'}
