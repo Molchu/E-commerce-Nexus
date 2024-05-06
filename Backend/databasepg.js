@@ -464,6 +464,34 @@ app.post('/mergecarts', fetchUser, async (req, res) => {
     }
 });
 
+app.post("/mercado_pago", async (req,res) => {
+    try {
+        const preference = {
+            items:[
+                { 
+                title: "Computador", 
+                unit_price: 233,
+                currency_id: "USD",
+                quantity: 2,
+                },
+            ],
+            back_urls: {
+                success: "http://localhost:3000/success",
+                failure: "http://localhost:3000/fallo",
+            },
+            
+            auto_return: "approved",
+        };
+
+        const respuesta = await mercadopago.preferences.create(preference);
+        console.log(respuesta);
+        res.status(200).json(respuesta);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json(error.message);
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);
