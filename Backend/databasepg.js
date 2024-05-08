@@ -1,15 +1,36 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const mercadopago = require("mercadopago");
+const dotenv = require("dotenv");
 const {Client} = require('pg');
+dotenv.config();
 
+mercadopago.configure({
+    access_token: process.env.ACCESS_TOKEN || "",
+});
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:5173'],// Reemplaza esto con el origen de tu frontend
+    credentials: true, // Permite incluir cookies en las solicitudes
+  }));
+
+app.use(cookieParser());
+app.use((req, res, next) => {
+    // Setear la cookie solo si no está presente
+    if (!req.cookies.guestCartId) {
+        const newGuestCartId = Math.random().toString(36).substring(2, 15); // Generar un nuevo identificador de carrito de usuario no registrado
+        res.cookie('guestCartId', newGuestCartId, { httpOnly: true, secure: true }); // Asegurar que la cookie solo sea accesible por HTTP y en conexiones seguras
+    }
+    next();
+});
+
 const port = 4000;
 
 const client = new Client({
@@ -29,23 +50,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(bodyParser.json());
-/*
-app.post('/signup', async (req, res) => {
-    const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
-    try {
-        const existingUser = await client.query('SELECT * FROM usuario WHERE correo=$1', [correo]);
-        if (existingUser.rows.length>0) {
-            return res.status(400).json({ error: 'correo ya registrado' })
-        }
 
-        await client.query('INSERT INTO usuario (nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena) VALUES ($1, $2, $3, $4, $5, $6, $7)', [nombre, apellido, correo, telefono, id, fecha_nacimiento,contrasena]);
-        res.status(201).json({ message: 'Usuario creado exitosamente' });
-    } catch (error) {
-        console.error('Error al crear usuario:', error);
-        res.status(500).json({ error: 'Error al crear usuario' });
-    }
-});
-*/
 app.post('/signup', async (req, res) => {
     const { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena } = req.body;
     try {
@@ -69,6 +74,14 @@ app.post('/signup', async (req, res) => {
         const data = { user: { id: user.id } };
         const token = jwt.sign(data, 'secret_ecom');
         console.log("Generated token:", token); // Imprimir el token aquí
+        // Aquí se obtiene o genera el userCartId
+        const userCartId = req.cookies.userCartId || Math.random().toString(36).substring(2, 15);
+        console.log('usercadid',userCartId);
+
+        // Se asocia el userCartId al usuario
+        await client.query('UPDATE usuario SET cart_id = $1 WHERE id = $2', [userCartId, user.id]);
+        console.log(userCartId);
+
         res.json({ success: true, token });
     } catch (error) {
         console.error('Error al crear usuario:', error);
@@ -86,13 +99,34 @@ app.post('/signin', async (req, res) => {
 
         const data = { user: { id: existingUser.rows[0].id } };
         const token = jwt.sign(data, 'secret_ecom');
-        console.log("Generated token:", token); // Imprimir el token aquí
+        // Obtener el userCartId asociado al usuario que inició sesión
+        const userCartId = await obtenerUserCart(existingUser.rows[0].id);
+        console.log(userCartId);
         res.json({ success: true, token });
     } catch (error) {
         console.error('Error al verificar el usuario:', error);
         res.status(500).json({ error: 'Error al verificar el usuario' });
     }
 });
+
+const obtenerUserCart = async (userId) => {
+    try {
+        const result = await client.query('SELECT cart_id FROM usuario WHERE id = $1', [userId]);
+        if (result.rows.length > 0) {
+            return result.rows[0].cart_id;
+        } else {
+            // Si no se encuentra un userCartId asociado al usuario, se puede generar uno nuevo
+            const newUserCartId = Math.random().toString(36).substring(2, 15);
+            await client.query('UPDATE usuario SET cart_id = $1 WHERE id = $2', [newUserCartId, userId]);
+            return newUserCartId;
+        }
+    } catch (error) {
+        console.error('Error al obtener userCartId:', error);
+        // Manejar el error adecuadamente, ya sea lanzando una excepción o devolviendo un valor predeterminado
+        return null;
+    }
+};
+
 
 
 const storage = multer.diskStorage({
@@ -106,39 +140,54 @@ const upload = multer({storage:storage})
 
 app.use('/images', express.static("upload/images"))
 
-app.post("/upload", upload.single('product'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No se ha recibido ningún archivo' });
+app.post("/upload", upload.array('image', 4), (req, res) => {
+    if (!req.files || req.files.length !== 4) {
+        return res.status(400).json({ error: 'Se requieren 4 archivos de imagen' });
     }
+    const imageUrls = req.files.map(file => `http://localhost:${port}/images/${file.filename}`);
+    const reversedUrls = imageUrls.reverse(); // Revertir el array de URLs
     res.json({
-        success:1,
-        image_url:`http://localhost:${port}/images/${req.file.filename}`
-    })
-})
+        success: 1,
+        image_urls: reversedUrls
+    });
+});
 
-app.post('/addproduct',async (req, res) => {
-    const { name, image, category, new_price, old_price,description } = req.body;
+app.post('/addproduct', async (req, res) => {
+    const { name, category, new_price, old_price, description, image_urls } = req.body;
+
+    // Validar que haya exactamente 4 URLs de imagen
+    if (image_urls.length !== 4) {
+        return res.status(400).json({ error: 'Se requieren exactamente 4 URLs de imagen' });
+    }
+
     try {
         const products = await client.query('SELECT * FROM product');
         let id;
-        if(products.rows.length > 0) {
+        if (products.rows.length > 0) {
             let lastproduct = products.rows[products.rows.length - 1];
             id = lastproduct.id + 1;
         } else {
             id = 1;
         }
 
-        await client.query('INSERT INTO product (id, name, image, category, new_price, old_price, description) VALUES ($1, $2, $3, $4, $5, $6, $7)', [id, name, image, category, new_price, old_price, description]);
-        console.log("Saved");
+        await client.query('INSERT INTO product (id, name, category, new_price, old_price, description) VALUES ($1, $2, $3, $4, $5, $6)', [id, name, category, new_price, old_price, description]);
+        console.log("Saved product with ID:", id);
+
+        // Insertar las URLs de las imágenes en la tabla product_image
+        for (let i = 0; i < image_urls.length; i++) {
+            await client.query('INSERT INTO product_image (product_id, image_url) VALUES ($1, $2)', [id, image_urls[i]]);
+            console.log("Saved image URL:", image_urls[i]);
+        }
+
         res.json({
             success: true,
             name: name
-        })
+        });
     } catch (error) {
         console.error('Error al crear producto:', error);
         res.status(500).json({ error: 'Error al crear producto' });
     }
-})
+});
 
 // Remove a product by ID
 app.post('/removeproduct', async (req, res) => {
@@ -156,10 +205,27 @@ app.post('/removeproduct', async (req, res) => {
     }
 });
 
+// necesita cambio
+app.put('/editproduct/:id', async (req, res) => {
+    const productId = req.params.id;
+    const { name, image, category, new_price, old_price, description } = req.body;
+    try {
+        await client.query('UPDATE product SET name=$1, image=$2, category=$3, new_price=$4, old_price=$5, description=$6 WHERE id=$7', [name, image, category, new_price, old_price, description, productId]);
+        console.log("Product Updated");
+        res.json({
+            success: true,
+            name: name
+        });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Error updating product' });
+    }
+});
+
 // Get all products
 app.get('/allproducts', async (req, res) => {
     try {
-        const products = await client.query('SELECT * FROM product');
+        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id GROUP BY p.id');
         console.log("All Products Fetched");
         res.send(products.rows);
     } catch (error) {
@@ -169,9 +235,10 @@ app.get('/allproducts', async (req, res) => {
 });
 
 
+
 app.get('/newcollections', async (req, res) => {
     try {
-        const products = await client.query('SELECT * FROM product ORDER BY date DESC LIMIT 8');
+        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id GROUP BY p.id ORDER BY p.date DESC LIMIT 8');
         console.log("Nuevas colecciones obtenidas");
         res.send(products.rows);
     } catch (error) {
@@ -180,9 +247,10 @@ app.get('/newcollections', async (req, res) => {
     }
 });
 
+
 app.get('/popularcollection', async (req, res) => {
     try {
-        const products = await client.query('SELECT * FROM product WHERE category = $1 LIMIT 4', ['Ropa']);
+        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id WHERE p.category = $1 GROUP BY p.id ORDER BY p.id LIMIT 4', ['Ropa']);
         console.log("Colección popular obtenida");
         res.send(products.rows);
     } catch (error) {
@@ -190,6 +258,21 @@ app.get('/popularcollection', async (req, res) => {
         res.status(500).json({ error: 'Error al obtener la colección popular' });
     }
 });
+
+app.get('/relatedproducts/:category', async (req, res) => {
+    const { category } = req.params;
+    try {
+        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id WHERE p.category = $1 GROUP BY p.id ORDER BY p.id LIMIT 4', [category]);
+        console.log(`Productos relacionados de la categoría ${category} obtenidos`);
+        res.send(products.rows);
+    } catch (error) {
+        console.error(`Error al obtener los productos relacionados de la categoría ${category}:`, error);
+        res.status(500).json({ error: `Error al obtener los productos relacionados de la categoría ${category}` });
+    }
+});
+
+
+
 
 const fetchUser = async (req, res, next) => {
     const authHeader = req.header('Authorization');
@@ -258,12 +341,12 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
 app.post('/getcart', fetchUser, async (req, res) => {
     const userId = req.user.id;
     try {
-        const cartItems = await client.query('SELECT p.id, p.name, p.image, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
+        const cartItems = await client.query('SELECT p.id, p.name, pi.image_url, p.new_price, up.quantity FROM user_product up JOIN product p ON up.product_id = p.id JOIN product_image pi ON p.id = pi.product_id WHERE up.user_id = $1 AND up.quantity > 0', [userId]);
         console.log("Cart items fetched");
         const formattedCartItems = cartItems.rows.map(item => ({
             id: item.id,
             name: item.name,
-            image: item.image,
+            image: item.image_url, // Utiliza image_url en lugar de image
             new_price: item.new_price,
             quantity: item.quantity
         }));
@@ -273,6 +356,7 @@ app.post('/getcart', fetchUser, async (req, res) => {
         res.status(500).json({ error: 'Error fetching cart items' });
     }
 });
+
 
 
 const verifyAccessToken = async (req, res, next) => {
@@ -315,15 +399,153 @@ app.get('/userinfo', verifyAccessToken, async (req, res) => {
 
 app.put('/userinfo', fetchUser, async (req, res) => {
     const userId = req.user.id;
-    const { nombre, apellido, correo, telefono, fecha_nacimiento } = req.body;
+    const { nombre, apellido, correo, telefono } = req.body; // Eliminamos fecha_nacimiento de aquí
 
     try {
-        await client.query('UPDATE usuario SET nombre = $1, apellido = $2, correo = $3, telefono = $4, fecha_nacimiento = $5 WHERE id = $6', [nombre, apellido, correo, telefono, fecha_nacimiento, userId]);
+        await client.query('UPDATE usuario SET nombre = $1, apellido = $2, correo = $3, telefono = $4 WHERE id = $5', [nombre, apellido, correo, telefono, userId]); // Eliminamos fecha_nacimiento de aquí
         res.status(200).json({ success: true, message: 'Información del usuario actualizada exitosamente' });
     } catch (error) {
         console.error('Error al actualizar la información del usuario:', error);
         res.status(500).json({ success: false, error: 'Error al actualizar la información del usuario' });
     }
+});
+
+
+app.get('/search', async (req, res) => {
+    const searchTerm = req.query.q;
+    try {
+        const searchResults = await client.query('SELECT * FROM product WHERE name ILIKE $1', [`%${searchTerm}%`]);
+        res.json(searchResults.rows);
+    } catch (error) {
+        console.error('Error al realizar la búsqueda:', error);
+        res.status(500).json({ error: 'Error al realizar la búsqueda' });
+    }
+});
+
+app.post('/adminsignin', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const admin = await client.query('SELECT * FROM admin WHERE email=$1 AND password=$2', [email, password]);
+        if (admin.rows.length === 0) {
+            return res.json({ success: false, errors: "Usuario o contraseña incorrectos" });
+        }
+
+        const data = { admin: { id: admin.rows[0].id } };
+        const token = jwt.sign(data, 'secret_ecom_admin');
+        console.log("Generated token:", token); // Imprimir el token aquí
+        res.json({ success: true, token });
+    } catch (error) {
+        console.error('Error al verificar el admin:', error);
+        res.status(500).json({ error: 'Error al verificar el admin' });
+    }
+});
+
+app.post('/addtocartguest', async (req, res) => {
+    const { productId } = req.body;
+    const guestCartId = req.headers['guestcartid']; // Accede al guestCartId desde el encabezado
+    console.log('guestCartId:', guestCartId);
+
+    // Verificar que productId no sea nulo o indefinido
+    if (!productId || !guestCartId) {
+        return res.status(400).json({ error: 'El productId y el guestCartId son requeridos' });
+    }
+
+    try {
+        const existingCartItem = await client.query('SELECT * FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        if (existingCartItem.rows.length > 0) {
+            await client.query('UPDATE guest_product SET quantity = quantity + 1 WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        } else {
+            await client.query('INSERT INTO guest_product (cart_id, product_id, quantity) VALUES ($1, $2, 1)', [guestCartId, productId]);
+        }
+        res.json({ success: true, message: 'Product added to guest cart' });
+    } catch (error) {
+        console.error('Error adding product to guest cart:', error);
+        res.status(500).json({ success: false, error: 'Error adding product to guest cart' });
+    }
+});
+
+app.post('/removefromcartguest', async (req, res) => {
+    const { productId } = req.body;
+    try {
+        // Verificar si el producto está en el carrito del usuario no registrado
+        const guestCartId = req.headers['guestcartid'];
+        console.log('guestCartId:', guestCartId);
+        const cart = await client.query('SELECT * FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+        if (cart.rows.length > 0) {
+            if (cart.rows[0].quantity > 1) {
+                await client.query('UPDATE guest_product SET quantity = quantity - 1 WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+            } else {
+                await client.query('DELETE FROM guest_product WHERE cart_id = $1 AND product_id = $2', [guestCartId, productId]);
+            }
+            res.json({ success: true, message: 'Product removed from guest cart' });
+        } else {
+            res.status(500).json({ success: false, error: 'El producto no está en el carrito' });
+        }
+    } catch (error) {
+        console.error('Error al remover producto del carrito:', error);
+        res.status(500).json({ error: 'Error al remover producto del carrito' });
+    }
+});
+
+
+
+app.post('/mergecarts', fetchUser, async (req, res) => {
+    const userId = req.user.id;
+    const guestCartId = req.headers['guestcartid'];
+    //const guestCartId = req.cookies.guestCartId; 
+
+    try {
+        // Verificar que el usuario tenga un carrito de invitado antes de fusionar
+        if (!guestCartId) {
+            return res.status(400).json({ error: 'No se encontró un carrito de invitado para fusionar' });
+        }
+
+        const guestCartItems = await client.query('SELECT * FROM guest_product WHERE cart_id = $1', [guestCartId]);
+        for (const item of guestCartItems.rows) {
+            const existingCartItem = await client.query('SELECT * FROM user_product WHERE user_id = $1 AND product_id = $2', [userId, item.product_id]);
+            if (existingCartItem.rows.length > 0) {
+                await client.query('UPDATE user_product SET quantity = quantity + $1 WHERE user_id = $2 AND product_id = $3', [item.quantity, userId, item.product_id]);
+            } else {
+                await client.query('INSERT INTO user_product (user_id, product_id, quantity) VALUES ($1, $2, $3)', [userId, item.product_id, item.quantity]);
+            }
+        }
+
+        // Eliminar los productos del carrito de usuario no registrado
+        await client.query('DELETE FROM guest_product WHERE cart_id = $1', [guestCartId]);
+
+        res.json({ success: true, message: 'Guest cart merged with user cart' });
+    } catch (error) {
+        console.error('Error merging guest cart with user cart:', error);
+        res.status(500).json({ success: false, error: 'Error merging guest cart with user cart' });
+    }
+});
+
+app.post("/mercado_pago", async (req,res) => {
+    try {
+        const preference = {
+            items:[
+                { 
+                title: "Computador", 
+                unit_price: 233,
+                currency_id: "USD",
+                quantity: 2,
+                },
+            ],
+            back_urls: {
+                success: "http://localhost:3000/success",
+                failure: "http://localhost:3000/fallo",
+            },
+            
+            auto_return: "approved",
+        };
+
+        const respuesta = await mercadopago.preferences.create(preference.response.init_point);
+        console.log(respuesta);
+        res.status(200).json(respuesta);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json(error.message);
+    }
 });
 
 

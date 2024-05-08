@@ -2,6 +2,7 @@
     width: 100%;
     padding-top: 100px;
     padding-bottom: 100px;
+    background-image: url('../../Components/Assets/fondo.png');
 }
 .profile-container {
     max-width: 600px;

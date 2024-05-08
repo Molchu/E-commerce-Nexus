@@ -14,6 +14,16 @@
     font-size: 16px;
 }
 
+.addproduct-itemfield1 {
+    display: inline-block; /* Cambiado a inline-block */
+    vertical-align: top; /* Para alinear arriba */
+    color: #7b7b7b;
+    font-size: 16px;
+    margin-right: 10px; /* Espacio entre cada upload_area */
+    
+}
+
+
 .addproduct-itemfield input{
     box-sizing: border-box;
     width: 100%;

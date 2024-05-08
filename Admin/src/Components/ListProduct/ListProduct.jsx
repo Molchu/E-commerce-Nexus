@@ -1,32 +1,27 @@
-import React, { useEffect, useState } from 'react'
-import "./ListProduct.css"
-import cross_icon from '../../assets/cart_cross_icon.png'
+import React, { useEffect, useState } from 'react';
+import "./ListProduct.css";
+import cross_icon from '../../assets/cart_cross_icon.png';
 
 const ListProduct = () => {
+    const [allproducts, setAllProducts] = useState([]);
 
-    const [allproducts,setAllProducts] = useState([]);
+    useEffect(() => {
+        fetch('http://localhost:4000/allproducts')
+            .then((res) => res.json())
+            .then((data) => setAllProducts(data));
+    }, []);
 
-    const fetchInfo = async () => {
-        await fetch('http://localhost:4000/allproducts')
-        .then((res)=>res.json())
-        .then((data)=>{setAllProducts(data)});
-    }
-
-    useEffect(()=>{
-        fetchInfo();
-    },[])
-
-    const remove_product = async (id)=>{
-        await fetch('http://localhost:4000/removeproduct',{
-            method:'POST',
-            headers:{
-                Accept:'application/json',
+    const removeProduct = async (id) => {
+        await fetch('http://localhost:4000/removeproduct', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:JSON.stringify({id:id})
-        })
-        await fetchInfo();
-    }
+            body: JSON.stringify({ id: id }),
+        });
+        setAllProducts(allproducts.filter(product => product.id !== id)); // Remove the product from the list
+    };
 
     return (
         <div className='list-product'>
@@ -44,20 +39,21 @@ const ListProduct = () => {
                 <hr />
                 {allproducts.map((product) => (
                     <div key={product.id} className="listproduct-format-main listproduct-format">
-                        <img src={product.image} alt="" className="listproduct-product-icon" />
+                        {Array.isArray(product.image_urls) && product.image_urls.length > 0 && (
+                            <img src={product.image_urls[0]} alt="" className="listproduct-product-icon" />
+                        )}
                         <p>{product.name}</p>
                         <p>${product.old_price}</p>
                         <p>${product.new_price}</p>
                         <p>{product.category}</p>
                         <p>{product.description}</p>
-                        <img onClick={() => { remove_product(product.id) }} className='listproduct-remove-icon' src={cross_icon} alt="" />
+                        <img onClick={() => removeProduct(product.id)} className='listproduct-remove-icon' src={cross_icon} alt="" />
                     </div>
                 ))}
                 <hr />
             </div>
         </div>
     );
-        
-}
+};
 
-export default ListProduct
+export default ListProduct;
