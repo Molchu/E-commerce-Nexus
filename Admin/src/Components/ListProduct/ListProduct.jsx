@@ -33,6 +33,7 @@ const ListProduct = () => {
                 <p>New Price</p>
                 <p>Category</p>
                 <p>Description</p>
+                <p>Size</p> {/* Nueva columna para la talla */}
                 <p>Remove</p>
             </div>
             <div className="listproduct-allproducts">
@@ -47,6 +48,7 @@ const ListProduct = () => {
                         <p>${product.new_price}</p>
                         <p>{product.category}</p>
                         <p>{product.description}</p>
+                        <p>{product.category === 'Ropa' && product.tallas.length > 0 ? product.tallas.join(', ') : '-'}</p> {/* Mostrar tallas si el producto es de categoría "Ropa" */}
                         <img onClick={() => removeProduct(product.id)} className='listproduct-remove-icon' src={cross_icon} alt="" />
                     </div>
                 ))}

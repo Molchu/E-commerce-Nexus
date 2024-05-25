@@ -75,6 +75,25 @@
     font-weight: 500;
 }
 
+/* CSS */
+.tallas-selector {
+    display: flex;
+    gap: 5px;
+}
+
+.tallas-selector button {
+    padding: 5px 10px;
+    background-color: black;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.tallas-selector button.selected {
+    background-color: #007bff;
+    color: white;
+}
+
+
 @media(max-width: 800px){
     .add-product{
         width: auto;

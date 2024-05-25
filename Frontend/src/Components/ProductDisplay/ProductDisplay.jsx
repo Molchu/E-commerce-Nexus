@@ -6,12 +6,22 @@ import { ShopContext } from '../../Context/ShopContext';
 import { useNavigate } from 'react-router-dom';
 
 const ProductDisplay = (props) => {
-  const { product } = props;
+  const { product = { tallas: [] } } = props;
   const { addToCart } = useContext(ShopContext);
+  const [selectedSize, setSelectedSize] = useState("");
   const navigate = useNavigate();
   const [mainImage, setMainImage] = useState(product.image_urls[0]);
 
   console.log('Categoría del producto:', product.category); // Imprimir la categoría del producto en la consola
+
+  const handleAddToCart = () => {
+    if (product.category === 'Ropa' && selectedSize && !product.tallas.includes(selectedSize)) {
+      alert('No tenemos esa talla en este producto');
+      return;
+    }
+    addToCart(product.id, selectedSize);
+    alert('¡Producto añadido al carrito!');
+  };
 
   return (
     <div className="productdisplay">
@@ -51,23 +61,23 @@ const ProductDisplay = (props) => {
           <div className="productdisplay-right-size">
             <h1>Seleccionar talla</h1>
             <div className="productdisplay-right-sizes">
-              <div>S</div>
-              <div>M</div>
-              <div>L</div>
-              <div>XL</div>
-              <div>XXL</div>
+              <div onClick={() => setSelectedSize("S")} className={selectedSize === "S" ? "selected" : ""}>S</div>
+              <div onClick={() => setSelectedSize("M")} className={selectedSize === "M" ? "selected" : ""}>M</div>
+              <div onClick={() => setSelectedSize("L")} className={selectedSize === "L" ? "selected" : ""}>L</div>
+              <div onClick={() => setSelectedSize("XL")} className={selectedSize === "XL" ? "selected" : ""}>XL</div>
+              <div onClick={() => setSelectedSize("XXL")} className={selectedSize === "XXL" ? "selected" : ""}>XXL</div>
             </div>
+            {selectedSize && !product.tallas.includes(selectedSize) && (
+              <p className="unavailable-size-message">No tenemos esa talla en este producto</p>
+            )}
           </div>
         )}
-        <button onClick={() => {
-          addToCart(product.id);
-          window.alert('¡Producto añadido al carrito!');
-        }}>Añadir al carrito</button>
+        <button onClick={handleAddToCart}>Añadir al carrito</button>
         <p className="productdisplay-right-category"><span>Categoria :</span>{product.category}</p>
         <p className="productdisplay-right-category"><span>Etiquetas :</span>Trendy, Novedad</p>
       </div>
     </div>
   );
-}
+};
 
 export default ProductDisplay;

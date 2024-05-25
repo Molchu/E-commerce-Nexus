@@ -152,8 +152,9 @@ app.post("/upload", upload.array('image', 4), (req, res) => {
     });
 });
 
+// Modificar la inserción de productos de ropa
 app.post('/addproduct', async (req, res) => {
-    const { name, category, new_price, old_price, description, image_urls } = req.body;
+    const { name, category, new_price, old_price, description, image_urls, tallas } = req.body;
 
     // Validar que haya exactamente 4 URLs de imagen
     if (image_urls.length !== 4) {
@@ -170,6 +171,7 @@ app.post('/addproduct', async (req, res) => {
             id = 1;
         }
 
+        // Insertar el producto en la tabla product
         await client.query('INSERT INTO product (id, name, category, new_price, old_price, description) VALUES ($1, $2, $3, $4, $5, $6)', [id, name, category, new_price, old_price, description]);
         console.log("Saved product with ID:", id);
 
@@ -179,6 +181,14 @@ app.post('/addproduct', async (req, res) => {
             console.log("Saved image URL:", image_urls[i]);
         }
 
+        // Insertar las tallas de ropa en la tabla talla_ropa
+        if (category === 'Ropa') {
+            for (let i = 0; i < tallas.length; i++) {
+                await client.query('INSERT INTO talla_ropa (product_id, talla) VALUES ($1, $2)', [id, tallas[i]]);
+                console.log("Saved talla:", tallas[i]);
+            }
+        }
+
         res.json({
             success: true,
             name: name
@@ -186,6 +196,18 @@ app.post('/addproduct', async (req, res) => {
     } catch (error) {
         console.error('Error al crear producto:', error);
         res.status(500).json({ error: 'Error al crear producto' });
+    }
+});
+
+// Modificar la obtención de productos de ropa
+app.get('/ropa', async (req, res) => {
+    try {
+        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls, COALESCE(array_agg(tr.talla), ARRAY[]::text[]) AS tallas FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id LEFT JOIN talla_ropa tr ON p.id = tr.product_id WHERE p.category = $1 GROUP BY p.id', ['Ropa']);
+        console.log("Productos de ropa obtenidos");
+        res.send(products.rows);
+    } catch (error) {
+        console.error('Error al obtener los productos de ropa:', error);
+        res.status(500).json({ error: 'Error al obtener los productos de ropa' });
     }
 });
 
@@ -225,14 +247,34 @@ app.put('/editproduct/:id', async (req, res) => {
 // Get all products
 app.get('/allproducts', async (req, res) => {
     try {
-        const products = await client.query('SELECT p.id, p.name, p.category, p.new_price, p.old_price, p.description, COALESCE(array_agg(pi.image_url), ARRAY[]::text[]) AS image_urls FROM product p LEFT JOIN product_image pi ON p.id = pi.product_id GROUP BY p.id');
-        console.log("All Products Fetched");
+        const products = await client.query(`
+            SELECT 
+                p.id, 
+                p.name, 
+                p.category, 
+                p.new_price, 
+                p.old_price, 
+                p.description, 
+                COALESCE(array_agg(DISTINCT pi.image_url), ARRAY[]::text[]) AS image_urls, 
+                CASE 
+                    WHEN p.category = 'Ropa' THEN COALESCE(array_agg(DISTINCT tr.talla), ARRAY[]::text[]) 
+                    ELSE NULL 
+                END AS tallas 
+            FROM product p 
+            LEFT JOIN product_image pi ON p.id = pi.product_id 
+            LEFT JOIN talla_ropa tr ON p.id = tr.product_id 
+            GROUP BY p.id
+        `);
+        console.log("All Products Fetched", products.rows);
         res.send(products.rows);
     } catch (error) {
         console.error('Error fetching all products:', error);
         res.status(500).json({ error: 'Error fetching all products' });
     }
 });
+
+
+
 
 
 

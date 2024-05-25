@@ -1,6 +1,6 @@
 .listproduct-format-main {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(8, 1fr); /* Incrementado a 8 columnas */
     gap: 10px;
     width: 100%;
     padding: 20px 0px;
@@ -41,6 +41,7 @@
     .listproduct-format-main {
         padding: 15px 0px;
         font-size: 12px;
+        grid-template-columns: repeat(8, 1fr); 
     }
     .listproduct-product-icon {
         height: 60px;

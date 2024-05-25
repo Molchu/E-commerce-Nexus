@@ -10,13 +10,13 @@ const AddProduct = () => {
         new_price: "",
         old_price: "",
         description: "",
-        image_urls: [], // Inicializar como un array vacío
+        image_urls: [],
+        tallas: []
     });
 
     const imageHandler = (e) => {
         const selectedImages = Array.from(e.target.files);
 
-        // Verificar que la cantidad total de imágenes no supere 4
         if (images.length + selectedImages.length <= 4) {
             setImages([...images, ...selectedImages]);
         } else {
@@ -25,20 +25,56 @@ const AddProduct = () => {
     };
 
     const changeHandler = (e) => {
-        setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === 'tallas') {
+            const tallasArray = value.split(',').map(talla => talla.trim());
+            setProductDetails({ ...productDetails, [name]: tallasArray });
+        } else {
+            setProductDetails({ ...productDetails, [name]: value });
+        }
+    };
+
+    const selectTalla = (talla) => {
+        if (!productDetails.tallas.includes(talla)) {
+            setProductDetails({ ...productDetails, tallas: [...productDetails.tallas, talla] });
+        } else {
+            setProductDetails({ ...productDetails, tallas: productDetails.tallas.filter(item => item !== talla) });
+        }
+    };
+
+    const resetForm = () => {
+        setProductDetails({
+            name: "",
+            category: "",
+            new_price: "",
+            old_price: "",
+            description: "",
+            image_urls: [],
+            tallas: []
+        });
+        setImages([]);
     };
 
     const Add_Product = async () => {
+        if (!productDetails.category) {
+            alert("Debe seleccionar una categoría para el producto");
+            return;
+        }
+
         let formData = new FormData();
 
-        // Agregar las imágenes al formData
         for (let i = 0; i < images.length; i++) {
             formData.append('image', images[i]);
         }
 
+        if (productDetails.category === 'Ropa') {
+            for (let i = 0; i < productDetails.tallas.length; i++) {
+                formData.append('tallas', productDetails.tallas[i]);
+            }
+        }
+
         let responseData;
         try {
-            // Realizar la petición al servidor
             const response = await fetch('http://localhost:4000/upload', {
                 method: 'POST',
                 headers: {
@@ -47,28 +83,26 @@ const AddProduct = () => {
                 body: formData,
             });
 
-            // Obtener la respuesta como objeto JSON
             responseData = await response.json();
 
             if (responseData.success) {
                 const { image_urls } = responseData;
-
-                // Actualizar las URLs de las imágenes en productDetails
-                setProductDetails({ ...productDetails, image_urls });
-
                 await fetch('http://localhost:4000/addproduct', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ ...productDetails, image_urls }), // Actualizar los detalles del producto solo si la carga de imágenes fue exitosa
+                    body: JSON.stringify({ ...productDetails, image_urls }),
                 }).then((resp) => resp.json()).then((data) => {
-                    // Mostrar el mensaje de éxito o fracaso
-                    data.success ? alert("Product Added") : alert("Failed");
+                    if (data.success) {
+                        alert("Product Added");
+                        resetForm(); // Restablecer el formulario después de agregar el producto
+                    } else {
+                        alert("Failed");
+                    }
                 });
             } else {
-                // Mostrar un mensaje de error si la carga de imágenes falla
                 alert("Failed to upload images");
             }
         } catch (error) {
@@ -119,12 +153,25 @@ const AddProduct = () => {
                     name="category"
                     className="add-product-selector"
                 >
+                    <option value="">Seleccione una categoría</option>
                     <option value="Ropa">Ropa</option>
                     <option value="Electrodomesticos">Electrodomesticos</option>
                     <option value="Gamer">Gamer</option>
                     <option value="Joyeria">Joyeria</option>
                 </select>
             </div>
+            {productDetails.category === 'Ropa' && (
+                <div className="addproduct-itemfield">
+                    <p>Tallas</p>
+                    <div className="tallas-selector">
+                        <button className={productDetails.tallas.includes('S') ? 'selected' : ''} onClick={() => selectTalla('S')}>S</button>
+                        <button className={productDetails.tallas.includes('M') ? 'selected' : ''} onClick={() => selectTalla('M')}>M</button>
+                        <button className={productDetails.tallas.includes('L') ? 'selected' : ''} onClick={() => selectTalla('L')}>L</button>
+                        <button className={productDetails.tallas.includes('XL') ? 'selected' : ''} onClick={() => selectTalla('XL')}>XL</button>
+                        <button className={productDetails.tallas.includes('XXL') ? 'selected' : ''} onClick={() => selectTalla('XXL')}>XXL</button>
+                    </div>
+                </div>
+            )}
             {images.map((img, index) => (
                 <div key={index} className="addproduct-itemfield1">
                     <label htmlFor={`file-input-${index}`}>
