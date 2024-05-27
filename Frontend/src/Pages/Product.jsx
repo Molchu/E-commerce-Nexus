@@ -10,14 +10,22 @@ const Product = () => {
   const { all_product } = useContext(ShopContext);
   const { productId } = useParams();
   const [product, setProduct] = useState(undefined);
+  const [loading, setLoading] = useState(true); // Estado de carga
 
   useEffect(() => {
-    const foundProduct = all_product.find((e) => e.id === Number(productId));
-    setProduct(foundProduct);
+    if (all_product && all_product.length > 0) {
+      const foundProduct = all_product.find((e) => e.id === Number(productId));
+      setProduct(foundProduct);
+      setLoading(false); // Desactivar el estado de carga
+    }
   }, [all_product, productId]);
 
-  if (!product) {
+  if (loading) {
     return <div>Loading...</div>; // Mostrar un mensaje de carga mientras se espera a que el producto se cargue
+  }
+
+  if (!product) {
+    return <div>Product not found</div>; // Mostrar un mensaje si el producto no se encuentra
   }
 
   return (

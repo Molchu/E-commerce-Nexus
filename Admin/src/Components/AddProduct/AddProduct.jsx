@@ -60,19 +60,19 @@ const AddProduct = () => {
             alert("Debe seleccionar una categoría para el producto");
             return;
         }
-
+    
         let formData = new FormData();
-
+    
         for (let i = 0; i < images.length; i++) {
             formData.append('image', images[i]);
         }
-
+    
         if (productDetails.category === 'Ropa') {
             for (let i = 0; i < productDetails.tallas.length; i++) {
                 formData.append('tallas', productDetails.tallas[i]);
             }
         }
-
+    
         let responseData;
         try {
             const response = await fetch('http://localhost:4000/upload', {
@@ -82,9 +82,9 @@ const AddProduct = () => {
                 },
                 body: formData,
             });
-
+    
             responseData = await response.json();
-
+    
             if (responseData.success) {
                 const { image_urls } = responseData;
                 await fetch('http://localhost:4000/addproduct', {
@@ -110,7 +110,7 @@ const AddProduct = () => {
             alert("Failed to add product");
         }
     };
-
+    
     return (
         <div className="add-product">
             <div className="addproduct-itemfield">

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './CSS/Signup.css';
 import axios from 'axios';
@@ -22,6 +22,7 @@ const Signup = () => {
   const [errorcheck, setErrorcheck] = useState('');
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [mostrarTerminos, setMostrarTerminos] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false); // Estado para recordar los datos
   const hasUpperCase = /[A-Z]/.test(contrasena);
   const hasLowerCase = /[a-z]/.test(contrasena);
   const hasSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(contrasena);
@@ -47,62 +48,71 @@ const Signup = () => {
     if (nombre.length === 0) {
       setErrorname('Ingrese un nombre valido');
       return;
-    }else{
-      setErrorname(false)
-    }if (apellido.length === 0) {
+    } else {
+      setErrorname(false);
+    }
+    if (apellido.length === 0) {
       setErrorlname('Ingrese un apellido valido');
       return;
-    }else{
+    } else {
       setErrorlname(false);
-    }if (correo.length === 0) {
+    }
+    if (correo.length === 0) {
       setErrormail('Ingrese su correo');
       return;
-    }else{
+    } else {
       setErrormail(false);
-    }if (!correo.endsWith('.com') && !correo.endsWith('.co')) {
+    }
+    if (!correo.endsWith('.com') && !correo.endsWith('.co')) {
       setErrormail('El correo debe terminar en ".com" o ".co"');
       return;
-    }else{
+    } else {
       setErrormail(false);
-    }if (telefono.length === 0 || telefono.length < 8) {
+    }
+    if (telefono.length === 0 || telefono.length < 8) {
       setErrortel('Ingrese un número de telefono');
       return;
-    }else{
+    } else {
       setErrortel(false);
-    }if (id.length === 0) {
+    }
+    if (id.length === 0) {
       setErrorid('Ingrese un número de identificación');
       return;
-    }else{
-      setErrorid(false)
-    }if (id.length < 8) {
+    } else {
+      setErrorid(false);
+    }
+    if (id.length < 8) {
       setErrorid('El número de identificación debe tener al menos 8 dígitos');
       return;
-    }else{
-      setErrorid(false)
-    }if (fecha_nacimiento.length === 0) {
+    } else {
+      setErrorid(false);
+    }
+    if (fecha_nacimiento.length === 0) {
       setErrorf('Seleccione su fecha de nacimiento');
       return;
-    }else{
-      setErrorf(false)
-    }if (selectedBirthDate > minBirthDate) {
+    } else {
+      setErrorf(false);
+    }
+    if (selectedBirthDate > minBirthDate) {
       setErrorf('Debe seleccionar una fecha de nacimiento válida (mínimo 10 años antes de la fecha actual)');
       return;
     } else {
       setErrorf(false);
-    }if (contrasena.length < 8) {
+    }
+    if (contrasena.length < 8) {
       setErrorpass('La contraseña debe tener al menos 8 caracteres');
       return;
-    }else if(!hasLowerCase) {
+    } else if (!hasLowerCase) {
       setErrorpass('La contraseña debe tener al menos una letra minuscula');
       return;
-    }else if(!hasUpperCase) {
+    } else if (!hasUpperCase) {
       setErrorpass('La contraseña debe tener al menos una letra mayuscula');
       return;
-    }else if(!hasSymbol) {
+    } else if (!hasSymbol) {
       setErrorpass('La contraseña debe tener al menos un símbolo');
       return;
-    }else{
-      setErrorpass(false)
+    } else {
+      setErrorpass(false);
     }
     if (!aceptaTerminos) {
       setErrorcheck('Debe aceptar los términos y condiciones para continuar');
@@ -110,11 +120,23 @@ const Signup = () => {
     }
     setError('');
     try {
-      const response = await axios.post('/signup', { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena});
+      const response = await axios.post('/signup', { nombre, apellido, correo, telefono, id, fecha_nacimiento, contrasena });
       const { token } = response.data;
       console.log('Token guardado:', token);
       localStorage.setItem('auth-token', token);
       localStorage.setItem('correoUsuario', correo);
+
+      if (rememberMe) { // Guardar el correo y la contraseña si la opción "Recordar mis datos" está seleccionada
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        const userIndex = users.findIndex(user => user.correo.toLowerCase() === correo.toLowerCase());
+        if (userIndex === -1) {
+          users.push({ correo, contrasena });
+        } else {
+          users[userIndex].contrasena = contrasena;
+        }
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+
       console.log(response.data); // Aquí puedes manejar la respuesta del backend si es necesario
       window.location.replace('/');
     } catch (error) {
@@ -124,34 +146,39 @@ const Signup = () => {
       console.error('Error al enviar datos al servidor:', error);
     }
   };
+
   return (
     <div className='signup'>
       <form className="signup-container" onSubmit={handleSubmit}>
         <h1>Registrarse</h1>
         <div className="signup-fields">
           <p>Nombre{errorname && <div className="error-message">{errorname}</div>}</p>
-          <input type="text" placeholder='Tu nombre' value={nombre} onChange={(e) => setNombre(e.target.value)}/>
+          <input type="text" placeholder='Tu nombre' value={nombre} onChange={(e) => setNombre(e.target.value)} />
           <p>Apellido{errorlname && <div className="error-message">{errorlname}</div>}</p>
-          <input type="text" placeholder='Tu apellido' value={apellido} onChange={(e) => setApellido(e.target.value)}/>
+          <input type="text" placeholder='Tu apellido' value={apellido} onChange={(e) => setApellido(e.target.value)} />
           <p>Correo{errormail && <div className="error-message">{errormail}</div>}</p>
-          <input type="email" placeholder='ejemplo@email.com' value={correo} onChange={(e) => setCorreo(e.target.value)}/>
+          <input type="email" placeholder='ejemplo@email.com' value={correo} onChange={(e) => setCorreo(e.target.value)} />
           <p>Teléfono{errortel && <div className="error-message">{errortel}</div>}</p>
-          <input type="tel" placeholder='3123342312' value={telefono} onChange={(e) => setTelefono(e.target.value)}/>
+          <input type="tel" placeholder='3123342312' value={telefono} onChange={(e) => setTelefono(e.target.value)} />
           <p>Identificación{errorid && <div className="error-message">{errorid}</div>}</p>
-          <input type="integer" placeholder='1085344440' value={id} onChange={(e) => setId(e.target.value)}/>
+          <input type="integer" placeholder='1085344440' value={id} onChange={(e) => setId(e.target.value)} />
           <p>Fecha de nacimiento{errorf && <div className="error-message">{errorf}</div>}</p>
-          <input type="date" title='Fecha' value={fecha_nacimiento} onChange={(e) => setFnacimiento(e.target.value)}/>
+          <input type="date" title='Fecha' value={fecha_nacimiento} onChange={(e) => setFnacimiento(e.target.value)} />
           <p>Contraseña{errorpass && <div className="error-message">{errorpass}</div>}</p>
-          <input type="password" placeholder='Tu contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}/>
+          <input type="password" placeholder='Tu contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)} />
           {errorcheck && <p className="error-message">{errorcheck}</p>}
+        </div>
+        <div className="signup-agree">
+          <input type="checkbox" id="rememberMe" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+          <label htmlFor="rememberMe">Recordar mis datos</label>
+        </div>
+        <div className="signup-agree">
+          <input type="checkbox" id="terminosCheckbox" checked={aceptaTerminos} onChange={handleAceptaTerminosChange} />
+          <label htmlFor="terminosCheckbox">Acepto los términos y condiciones</label>
+          <button type="button" onClick={handleMostrarTerminos}>Ver términos y condiciones</button>
         </div>
         <button type="submit">Continuar</button>
         <p className="signup-login">¿Ya tienes una cuenta? <Link to='/signin'>Inicia sesión aquí</Link></p>
-        <div className="signup-agree">
-          <input type="checkbox" id="terminosCheckbox" checked={aceptaTerminos} onChange={handleAceptaTerminosChange}/>
-          <label htmlFor="terminosCheckbox">Acepto los términos y condiciones</label>
-          <button onClick={handleMostrarTerminos}>Ver términos y condiciones</button>
-        </div>
       </form>
       {mostrarTerminos && (
         <div className="terminos-modal">

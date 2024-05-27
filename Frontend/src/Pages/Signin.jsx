@@ -73,7 +73,6 @@ const Signin = () => {
             users[userIndex].contrasena = contrasena;
           }
           localStorage.setItem('users', JSON.stringify(users));
-          localStorage.setItem('contrasenaUsuario', contrasena); // Guardar contrasenaUsuario en localStorage
         }
 
         window.location.replace('/');

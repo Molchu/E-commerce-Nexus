@@ -131,12 +131,12 @@ const obtenerUserCart = async (userId) => {
 
 const storage = multer.diskStorage({
     destination: './upload/images',
-    filename:(req,file,cb)=>{
-        return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+    filename: (req, file, cb) => {
+        return cb(null, `${file.fieldname}_${Date.now()}_${Math.random().toString(36).substring(2, 15)}${path.extname(file.originalname)}`);
     }
-})
+});
 
-const upload = multer({storage:storage})
+const upload = multer({ storage: storage });
 
 app.use('/images', express.static("upload/images"))
 

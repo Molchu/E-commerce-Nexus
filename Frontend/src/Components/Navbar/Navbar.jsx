@@ -1,10 +1,10 @@
-import React, { useContext, useState, useRef, useEffect } from 'react'
-import './Navbar.css'
-import logo from '../Assets/Logo.png'
-import cart_icon from '../Assets/cart_icon.png'
-import { Link } from 'react-router-dom'
-import { ShopContext } from '../../Context/ShopContext'
-import nav_dropdown from '../Assets/nav_dropdown.png'
+import React, { useContext, useState, useRef, useEffect } from 'react';
+import './Navbar.css';
+import logo from '../Assets/Logo.png';
+import cart_icon from '../Assets/cart_icon.png';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShopContext } from '../../Context/ShopContext';
+import nav_dropdown from '../Assets/nav_dropdown.png';
 
 const Navbar = () => {
 
@@ -14,6 +14,7 @@ const Navbar = () => {
     const correoUsuario = localStorage.getItem('correoUsuario');
     const [showMenu, setShowMenu] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -65,6 +66,11 @@ const Navbar = () => {
         setShowMenu(false);
     }
 
+    // Función para manejar el clic en "Identifícate"
+    const handleSignInClick = () => {
+        navigate('/signin');
+        window.location.reload();
+    }
 
     return (
         <div className='navbar'>
@@ -80,10 +86,10 @@ const Navbar = () => {
                         <li><Link to='/'>Tienda</Link></li>
                         <div>--------------</div>
                         <li><strong>Categorías:</strong></li>
-                        <li><Link to='/Ropa'>Ropa</Link></li>
-                        <li><Link to='/Electrodomesticos'>Electrodomesticos</Link></li>
-                        <li><Link to='/Gamer'>Zona Gamer</Link></li>
-                        <li><Link to='/Joyeria'>Joyeria</Link></li>
+                        <li><Link to='/ropa'>Ropa</Link></li>
+                        <li><Link to='/electrodomesticos'>Electrodomesticos</Link></li>
+                        <li><Link to='/gamer'>Zona Gamer</Link></li>
+                        <li><Link to='/joyeria'>Joyeria</Link></li>
                         <div>--------------</div>
                         <li><strong>Categorías:</strong></li>
                         <li><Link to='/regalo'>Tarjetas de regalo</Link></li>
@@ -107,10 +113,9 @@ const Navbar = () => {
             </div>
             <a href="/musica" className="options2">Nexus music: 3 meses gratis</a>
 
-
             <div className="nav-login-cart">
                 {!localStorage.getItem('auth-token') &&
-                    <Link to='/signin'><button>Identificate</button></Link>}
+                    <button onClick={handleSignInClick}>Identifícate</button>}
                 {correoUsuario && (
                     <div className='prueba'>
                         <p className="username" onClick={handleUsernameClick}>Hola, {correoUsuario}</p>
@@ -126,8 +131,7 @@ const Navbar = () => {
                 <div className="nav-cart-count">{getTotalCartItems()}</div>
             </div>
         </div>
-
     )
 }
 
-export default Navbar
+export default Navbar;
