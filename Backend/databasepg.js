@@ -17,7 +17,7 @@ mercadopago.configure({
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],// Reemplaza esto con el origen de tu frontend
+    origin: ['http://localhost:3000', 'http://localhost:5173'],
     credentials: true, // Permite incluir cookies en las solicitudes
   }));
 

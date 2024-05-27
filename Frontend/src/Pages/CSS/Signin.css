@@ -1,4 +1,4 @@
-.signin{
+.signin {
     width: 100%;
     height: 75vh;
     background: #f3c3fe;
@@ -7,23 +7,27 @@
     background-size: cover;
     background-position: center;
 }
-.signin-container{
+
+.signin-container {
     width: 580px;
     height: 635px;
     background: white;
     margin: auto;
     padding: 40px 70px;
 }
-.signin-container h1{
+
+.signin-container h1 {
     margin: 20px 0px;
 }
-.signin-fields{
+
+.signin-fields {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-top: 20px;
 }
-.signin-fields input{
+
+.signin-fields input {
     height: 70px;
     width: 100%;
     padding-left: 20px;
@@ -32,7 +36,37 @@
     color: #5c5c5c;
     font-size: 18px;
 }
-.signin-container button{
+
+.suggestion {
+    cursor: pointer; 
+    background-color: #f0f0f0; 
+    padding: 10px;
+    border: 1px solid #c9c9c9;
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: -10px; 
+}
+
+.remember-me input[type="checkbox"] {
+    width: 12px; 
+    height: 12px; 
+    padding: 0;
+    margin: 0;
+}
+
+.remember-me label {
+    font-size: 14px; 
+    color: #5c5c5c;
+    line-height: 1.5;
+}
+
+.signin-container button {
     width: 580px;
     height: 72px;
     color: white;
@@ -43,58 +77,71 @@
     font-weight: 500;
     cursor: pointer;
 }
-.signin-login{
+
+.signin-login {
     margin-top: 20px;
     color: #5c5c5c;
     font-size: 18px;
     font-weight: 500;
 }
-.signin-login span{
+
+.signin-login span {
     color: #ff4141;
     font-weight: 600;
 }
 
-@media(max-width:1280px){
-    .signin{
+@media (max-width: 1280px) {
+    .signin {
         padding-top: 50px;
     }
-    .signin-container{
+
+    .signin-container {
         width: auto;
         max-width: 500px;
         max-height: 500px;
     }
-    .signin-container h1{
+
+    .signin-container h1 {
         margin: 10px 0px;
     }
-    .signin-fields{
+
+    .signin-fields {
         gap: 20px;
         margin-top: 20px;
     }
-    .signin-fields input{
+
+    .signin-fields input {
         height: 65px;
         width: 93%;
     }
-    .signin-container button{
+
+    .signin-container button {
         width: 100%;
     }
-    .signin-login{
+
+    .signin-login {
         font-size: 16px;
     }
 }
-@media(max-width:800px){
-    .signin-container{
+
+@media (max-width: 800px) {
+    .signin-container {
         padding: 20px 30px;
     }
-    .signin-container h1{
+
+    .signin-container h1 {
         font-size: 24px;
     }
-    .signin-fields{
+
+    .signin-fields {
         margin-top: 20px;
     }
-    .signin-fields input{
+
+    .signin-fields input {
         height: 50px;
     }
-    .signin-container button{
+
+    .signin-container button {
         height: 50px;
         font-size: 16px;
     }
