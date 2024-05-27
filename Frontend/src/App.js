@@ -21,6 +21,7 @@ import CustomerService from './Pages/CustomerService';
 import NexusMusic from './Pages/NexusMusic';
 import Offers from './Pages/Offers';
 import Payment from './Pages/Payment';
+import ZendeskWidget from './Components/ZendeskWidget';
 
 function App() {
   const [results, setResults] = useState([]);
@@ -52,6 +53,7 @@ function App() {
           <Route path='/payment' element={<Payment />} />
         </Routes>
         <Footer />
+        <ZendeskWidget />
       </BrowserRouter>
     </div>
   );

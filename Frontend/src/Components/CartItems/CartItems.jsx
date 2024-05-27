@@ -1,16 +1,40 @@
-import React, { useContext } from 'react';
+import React, { Profiler, useContext } from 'react';
 import './CartItems.css';
 import { ShopContext } from '../../Context/ShopContext';
 import remove_icon from '../Assets/cart_cross_icon.png';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const CartItems = () => {
     const { all_product, cartItems, removeFromCart, getTotalCartAmount } = useContext(ShopContext);
     const navigate = useNavigate();
 
-    const handlePayment = () => {
-        navigate('/payment');
-    };
+    const PayProducts = async () => {
+        const productsToSend = Object.keys(cartItems).map((key) => {
+            const [productId, size] = key.split('-');
+            const product = all_product.find((e) => e.id.toString() === productId);
+            if (product && cartItems[key] > 0) {
+                return {
+                    title: product.name,
+                    unit_price: parseFloat(product.new_price),
+                    quantity: cartItems[key],
+                    size: product.category === 'Ropa' ? size : undefined,
+                };
+            }
+            return null;
+        }).filter(item => item !== null);
+        console.log(productsToSend)
+        try {
+            const response = await axios.post(
+                'http://localhost:4000/mercado_pago',
+                productsToSend
+            );
+            window.location.href = response.data;
+            console.log(response.data);
+        } catch (error) {
+            console.error('Error al enviar los productos al backend:', error);
+        }
+    }
 
     return (
         <div className='cartitems'>
@@ -65,7 +89,7 @@ const CartItems = () => {
                             <h3>${getTotalCartAmount()}</h3>
                         </div>
                     </div>
-                    <button onClick={handlePayment}>Pagar</button>
+                    <button onClick={PayProducts}>Pagar</button>
                 </div>
                 <div className="cartitems-promocode">
                     <p>Si tienes un código de promoción, ponlo aquí</p>
