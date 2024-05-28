@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from 'styled-components';
 import searchIcon from '../Assets/search.png';
 import locationIcon from '../Assets/location.png';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate de react-router-dom
+import { useNavigate } from 'react-router-dom';
+import Autocomplete from './Autocomplete';
 
 const Container = styled.div`
   height: 60px;
@@ -14,6 +15,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 `;
 
 const Left = styled.div`
@@ -42,13 +44,11 @@ const LocationIcon = styled.img`
 `;
 
 const SearchContainer = styled.div`
-  border: 0.5px solid lightgray;
   display: flex;
   align-items: center;
   margin-left: 30px;
-  padding: 5px;
   width: 800px;
-  height: 28px;
+  position: relative;
 `;
 
 const SearchButton = styled.button`
@@ -65,7 +65,7 @@ const SearchIcon = styled.img`
 
 const Input = styled.input`
   border: none;
-  width:800px;
+  width:100%;
   height: 30px;
   padding-right: 30px;
   font-size: 16px;
@@ -96,31 +96,29 @@ const MenuItem = styled.div`
 
 const Topbar = ({ setResults, setShowSearchResults }) => {
   const [input, setInput] = useState('');
-  const navigate = useNavigate(); // Obtiene la función de navegación
+  const [suggestions, setSuggestions] = useState([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const navigate = useNavigate();
 
-  
+  useEffect(() => {
+    fetch('http://localhost:4000/allproducts')
+      .then((response) => response.json())
+      .then((data) => setSuggestions(data))
+      .catch((error) => console.error('Error fetching suggestions:', error));
+  }, []);
 
   const handleChange = (value) => {
     setInput(value);
+    if (value) {
+      const results = suggestions.filter((product) =>
+        product.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSuggestions(results);
+    } else {
+      setFilteredSuggestions([]);
+    }
   };
 
-  const fetchData = (value) => {
-    fetch('http://localhost:4000/allproducts')
-      .then((response) => response.json())
-      .then((json) => {
-        const results = json.filter((product) => {
-          return value && product && product.name && product.name.toLowerCase().includes(value.toLowerCase());
-        });
-        console.log('Resultados encontrados:', results);
-        setResults(results);
-        setShowSearchResults(true);
-        navigate('/search-results'); // Navega a la página de resultados
-      })
-      .catch((error) => {
-        console.error('Error al buscar productos:', error);
-      });
-  };
-  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -128,14 +126,33 @@ const Topbar = ({ setResults, setShowSearchResults }) => {
   };
 
   const handleSearch = () => {
-    fetchData(input);
+    const results = suggestions.filter((product) =>
+      product.name.toLowerCase().includes(input.toLowerCase())
+    );
+    setResults(results);
+    setShowSearchResults(true);
+    navigate('/search-results');
     setInput('');
+    setFilteredSuggestions([]);
   };
 
-  const handleClearSearch = () => {
+  const handleSuggestionClick = (suggestion) => {
+    setInput(suggestion.name);
+    fetchDataWithSimilarity(suggestion);
+  };
+
+  const fetchDataWithSimilarity = (suggestion) => {
+    const primaryResult = suggestions.filter(product => product.id === suggestion.id);
+    const relatedResults = suggestions.filter(product =>
+      product.id !== suggestion.id && product.name.toLowerCase().includes(suggestion.name.toLowerCase())
+    );
+
+    const allResults = [...primaryResult, ...relatedResults];
+    setResults(allResults);
+    setShowSearchResults(true);
+    navigate('/search-results');
     setInput('');
-    setResults([]);
-    setShowSearchResults(false);
+    setFilteredSuggestions([]);
   };
 
   return (
@@ -159,6 +176,13 @@ const Topbar = ({ setResults, setShowSearchResults }) => {
             <SearchButton onClick={handleSearch}>
               <SearchIcon src={searchIcon} alt="Search" />
             </SearchButton>
+            {filteredSuggestions.length > 0 && (
+              <Autocomplete
+                suggestions={filteredSuggestions}
+                onSuggestionClick={handleSuggestionClick}
+                clearSuggestions={() => setFilteredSuggestions([])}
+              />
+            )}
           </SearchContainer>
         </Center>
         <Right>
