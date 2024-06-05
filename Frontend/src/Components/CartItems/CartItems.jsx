@@ -17,6 +17,7 @@ const CartItems = () => {
                 return {
                     title: product.name,
                     unit_price: parseFloat(product.new_price),
+                    currency_id: "COP",
                     quantity: cartItems[key],
                     size: product.category === 'Ropa' ? size : undefined,
                 };
@@ -59,9 +60,9 @@ const CartItems = () => {
                                     <p>{product.name}</p>
                                     {product.category === 'Ropa' && <p>Talla: {size}</p>}
                                 </div>
-                                <p>${product.new_price}</p>
+                                <p>{product.new_price} COP</p>
                                 <button className="cartitems-quantity">{cartItems[key]}</button>
-                                <p>${product.new_price * cartItems[key]}</p>
+                                <p>{product.new_price * cartItems[key]} COP</p>
                                 <img className="cartitems-remove-icon" src={remove_icon} onClick={() => { removeFromCart(productId, size) }} alt="" />
                             </div>
                             <hr />
@@ -76,7 +77,7 @@ const CartItems = () => {
                     <div>
                         <div className="cartitems-total-item">
                             <p>Subtotal</p>
-                            <p>${getTotalCartAmount()}</p>
+                            <p>COP {getTotalCartAmount()}</p>
                         </div>
                         <hr />
                         <div className="cartitems-total-item">
@@ -86,7 +87,7 @@ const CartItems = () => {
                         <hr />
                         <div className='cartitems-total-item'>
                             <h3>Total</h3>
-                            <h3>${getTotalCartAmount()}</h3>
+                            <h3>COP {getTotalCartAmount()}</h3>
                         </div>
                     </div>
                     <button onClick={PayProducts}>Pagar</button>
