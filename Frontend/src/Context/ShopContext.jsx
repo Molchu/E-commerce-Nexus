@@ -120,6 +120,10 @@ const ShopContextProvider = (props) => {
     };
 
     const removeFromCart = (itemId, size) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este producto del carrito?")) {
+            return;
+        }
+
         const authToken = localStorage.getItem('auth-token');
         let guestCartId = localStorage.getItem('guestCartId');
 

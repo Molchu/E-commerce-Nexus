@@ -23,6 +23,14 @@ const ListProduct = () => {
         setAllProducts(allproducts.filter(product => product.id !== id)); // Remove the product from the list
     };
 
+    const formatPrice = (price) => {
+        const numericPrice = parseFloat(price);
+        if (isNaN(numericPrice)) {
+            return "$0";
+        }
+        return `$${numericPrice.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} COP`;
+    };
+
     return (
         <div className='list-product'>
             <h1>All Products List</h1>
@@ -44,8 +52,8 @@ const ListProduct = () => {
                             <img src={product.image_urls[0]} alt="" className="listproduct-product-icon" />
                         )}
                         <p>{product.name}</p>
-                        <p>{product.old_price} COP</p>
-                        <p>{product.new_price} COP</p>
+                        <p>{formatPrice(product.old_price)}</p>
+                        <p>{formatPrice(product.new_price)}</p>
                         <p>{product.category}</p>
                         <p>{product.description}</p>
                         <p>{product.category === 'Ropa' && product.tallas.length > 0 ? product.tallas.join(', ') : '-'}</p> {/* Mostrar tallas si el producto es de categoría "Ropa" */}
